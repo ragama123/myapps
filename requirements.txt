@@ -6,3 +6,4 @@ pandas-datareader
 prophet
 google.generativeai
 seaborn
+st_aggrid
