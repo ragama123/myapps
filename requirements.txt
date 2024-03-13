@@ -4,7 +4,6 @@ streamlit
 pandas-datareader
 prophet
 google
-json
 matplotlib
 seaborn
 streamlit-aggrid
