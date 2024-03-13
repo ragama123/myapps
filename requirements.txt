@@ -1,13 +1,10 @@
 pandas
 plotly
 streamlit
-yfinance
 pandas-datareader
 prophet
-google.generativeai
 google
 json
 matplotlib
 seaborn
-plotly
 st-aggrid
