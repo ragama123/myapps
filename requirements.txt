@@ -7,4 +7,4 @@ google
 json
 matplotlib
 seaborn
-st-aggrid
+streamlit-aggrid
