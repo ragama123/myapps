@@ -3,7 +3,3 @@ plotly
 streamlit
 pandas-datareader
 prophet
-google
-matplotlib
-seaborn
-streamlit-aggrid
