@@ -10,12 +10,16 @@ from fpdf import FPDF
 from streamlit_lottie import st_lottie
 from IPython.display import JSON
 import json
+import requests
 
 st.set_page_config(layout='wide')
 
-def load_lottiefile(filepath:str):
-            with open(filepath, "r") as f:
-                return json.load(f)
+def load_lottiefile(url: str):
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(f"Failed to load Lottie file from URL: {url}. Status code: {response.status_code}")
 # Configure API key
 GOOGLE_API_KEY = "AIzaSyCUPTiOotHcQzOBcv6m-9aFu9WGrzBl2Y4"
 genai.configure(api_key=GOOGLE_API_KEY)
