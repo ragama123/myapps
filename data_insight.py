@@ -129,7 +129,7 @@ def main():
     col1, col2 = st.columns(2)
     with col1:
             st.markdown("<h5 class='instruction_heading'> </h5>", unsafe_allow_html=True)
-            lottie_creator = load_lottiefile("https://hpinclookac.github.io/data.json")
+            lottie_creator = load_lottiefile("https://hpinclookac.github.io/1.json")
             st_lottie(lottie_creator, speed=1, reverse=False, loop=True, height=450)
             # Video Section
             # st.subheader("Introduction Video:")
