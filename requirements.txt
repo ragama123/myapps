@@ -4,3 +4,6 @@ streamlit
 pandas-datareader
 prophet
 google-generativeai
+streamlit-lottie
+reportlab
+fpdf
