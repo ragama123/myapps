@@ -125,7 +125,7 @@ def main():
     col1, col2 = st.columns(2)
     with col1:
             st.markdown("<h5 class='instruction_heading'> </h5>", unsafe_allow_html=True)
-            lottie_creator = load_lottiefile("c:/Users/sinmanis/OneDrive - HP Inc/Python/Streamlit/HP Analysis/1.json")
+            lottie_creator = load_lottiefile("https://github.com/ragama123/myapps/blob/main/1.json")
             st_lottie(lottie_creator, speed=1, reverse=False, loop=True, height=450)
             # Video Section
             # st.subheader("Introduction Video:")
