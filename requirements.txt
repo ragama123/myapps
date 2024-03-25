@@ -8,3 +8,4 @@ streamlit-lottie
 reportlab
 fpdf
 streamlit-aggrid
+ipython
