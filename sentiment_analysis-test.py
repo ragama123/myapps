@@ -101,18 +101,14 @@ def main():
             st.subheader("Sentiment Distribution")
             plot_sentiment_distribution(df)
 
-            st.subheader("Comments Classification by Sentiment Score")
             sentiment_df = pd.DataFrame(columns=['Category', 'Positive', 'Neutral', 'Negative'])
 
             for category in categories:
                 positive_count = ((df[category] > 0) & (df['Sentiment'] == 'positive')).sum()
                 neutral_count = ((df[category] > 0) & (df['Sentiment'] == 'neutral')).sum()
                 negative_count = ((df[category] > 0) & (df['Sentiment'] == 'negative')).sum()
-                sentiment_df = sentiment_df.append({'Category': category,
-                                                    'Positive': positive_count,
-                                                    'Neutral': neutral_count,
-                                                    'Negative': negative_count},
-                                                    ignore_index=True)
+                sentiment_df.loc[len(sentiment_df)] = [category, positive_count, neutral_count, negative_count]
+
 
             st.table(sentiment_df)
 
