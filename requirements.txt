@@ -9,3 +9,7 @@ reportlab
 fpdf
 streamlit-aggrid
 ipython
+nltk
+SentimentIntensityAnalyzer
+seaborn
+WordCloud
