@@ -16,4 +16,4 @@ openpyxl
 yfinance
 numpy
 datetime
-plotly==4.14.3
+plotly plotly 
