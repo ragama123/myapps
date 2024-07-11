@@ -16,5 +16,4 @@ nltk
 openpyxl
 yfinance
 numpy
-plotly.graph_objs
 datetime
