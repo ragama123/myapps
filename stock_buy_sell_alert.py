@@ -23,8 +23,8 @@ stock_list = {
 st.title("Technical Analysis Tool")
 
 # Calculate default start and end dates
-end_date_default = datetime.today()
-start_date_default = end_date_default - timedelta(days=90)
+end_date_default = datetime.today() + timedelta(days=1)
+start_date_default = end_date_default - timedelta(days=91)
 
 # Initialize session state variables
 if "custom_stock" not in st.session_state:
@@ -50,7 +50,7 @@ selected_stock = st.selectbox(
 )
 
 custom_stock = st.text_input(
-    "Or type a custom Stock Code:",
+    "Or type a custom Stock Code (e.g. INFY.NS, LICI.NS, CDSL.NS, LTIM.NS...etc)",
     value=st.session_state.custom_stock,
     key="custom_stock",
     on_change=clear_selected_stock
@@ -87,7 +87,7 @@ if stock_code:
             current_price_str = "No data available"
         
         # Display current stock price above the chart
-        st.subheader(f"Current Stock Price {f'({company_name})' if company_name else ''}: {current_price_str}")
+        st.subheader(f"Current Stock Price {f'({stock_code})' if stock_code else ''}: {current_price_str}")
     else:
         st.error("No data available for the provided stock code and date range. Please check the inputs and try again.")
         st.stop()
