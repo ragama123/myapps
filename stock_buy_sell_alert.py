@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 # Predefined list of stock codes with company names
 stock_list = {
     "^NSEI": "NIFTY 50",
+    "^NSEBANK": "^NIFTY BANK",
     "INFY.NS": "INFY",
     "LICI.NS": "LIC",
     "CDSL.NS": "CDSL",
