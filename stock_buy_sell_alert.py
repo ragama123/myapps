@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 
 # Predefined list of stock codes with company names
 stock_list = {
+    "^NSEI": "NIFTY 50",
     "INFY.NS": "INFY",
     "LICI.NS": "LIC",
     "CDSL.NS": "CDSL",
@@ -16,7 +17,11 @@ stock_list = {
     "RELIANCE.NS": "Reliance Industries Ltd.",
     "TCS.NS": "Tata Consultancy Services Ltd.",
     "RVNL.NS": "RVNL",
-    "WIPRO.NS": "WIPRO"
+    "WIPRO.NS": "WIPRO",
+    "HDFCBANK.NS": "HDFCBANK",
+    "YESBANK.NS": "YESBANK",
+    "ICICIBANK.NS": "ICICIBANK",
+    "MAZDOCK.NS": "MAZDOCK"
 }
 
 # Title
@@ -262,6 +267,7 @@ with col6:
 
 # Display analysis
 st.subheader("Analysis")
+st.write(f"Selected Stock Code: {stock_code} {f'({company_name})' if company_name else ''}")
 
 # RSI and MACD signals
 rsi_signal = "No Signal"
