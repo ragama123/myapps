@@ -17,4 +17,4 @@ openpyxl
 yfinance
 numpy
 datetime
-plotly.graph_objects
+plotly==3.10.0
