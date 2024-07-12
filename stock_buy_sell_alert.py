@@ -106,8 +106,8 @@ def calculate_rsi(data, window=14):
     delta = data['Close'].diff()
     gain = (delta.where(delta > 0, 0)).fillna(0)
     loss = (-delta.where(delta < 0, 0)).fillna(0)
-    avg_gain = gain.rolling(window=window, min_periods=1).mean()
-    avg_loss = loss.rolling(window=window, min_periods=1).mean()
+    avg_gain = gain.ewm(span=window, min_periods=1, adjust=False).mean()
+    avg_loss = loss.ewm(span=window, min_periods=1, adjust=False).mean()
     rs = avg_gain / avg_loss
     rsi = 100 - (100 / (1 + rs))
     return rsi
@@ -158,6 +158,26 @@ def calculate_ema(data, window=50):
 
 data['EMA_50'] = calculate_ema(data, 50)
 data['EMA_200'] = calculate_ema(data, 200)
+
+# Calculate Average True Range (ATR)
+def calculate_atr(data, window=14):
+    high_low = data['High'] - data['Low']
+    high_close = np.abs(data['High'] - data['Close'].shift())
+    low_close = np.abs(data['Low'] - data['Close'].shift())
+    ranges = pd.concat([high_low, high_close, low_close], axis=1)
+    true_range = ranges.max(axis=1)
+    atr = true_range.rolling(window=window).mean()
+    return atr
+
+data['ATR'] = calculate_atr(data)
+
+# Calculate On-Balance Volume (OBV)
+def calculate_obv(data):
+    obv = np.where(data['Close'] > data['Close'].shift(), data['Volume'], -data['Volume'])
+    obv = obv.cumsum()
+    return obv
+
+data['OBV'] = calculate_obv(data)
 
 # CSS for styling
 st.markdown("""
@@ -276,12 +296,18 @@ macd_signal = "No Signal"
 bollinger_signal = "No Signal"
 stochastic_signal = "No Signal"
 ema_signal = "No Signal"
+atr_signal = "No Signal"
+obv_signal = "No Signal"
 
-if data["RSI"].iloc[-1] < 30 and data["MACD"].iloc[-1] > data["MACD_Signal"].iloc[-1]:
+# Signal calculations
+if data["RSI"].iloc[-1] < 30:
     rsi_signal = "Buy Signal"
-    macd_signal = "Buy Signal"
-elif data["RSI"].iloc[-1] > 70 and data["MACD"].iloc[-1] < data["MACD_Signal"].iloc[-1]:
+elif data["RSI"].iloc[-1] > 70:
     rsi_signal = "Sell Signal"
+
+if data["MACD"].iloc[-1] > data["MACD_Signal"].iloc[-1]:
+    macd_signal = "Buy Signal"
+elif data["MACD"].iloc[-1] < data["MACD_Signal"].iloc[-1]:
     macd_signal = "Sell Signal"
 
 if data["Close"].iloc[-1] < data["Lower_Band"].iloc[-1]:
@@ -308,6 +334,16 @@ elif data["EMA_50"].iloc[-1] < data["EMA_200"].iloc[-1]:
 else:
     ema_signal = "No Signal"
 
+if data['ATR'].iloc[-1] > data['ATR'].mean():
+    atr_signal = "High Volatility"
+else:
+    atr_signal = "Low Volatility"
+
+if data['OBV'].iloc[-1] > data['OBV'].mean():
+    obv_signal = "Positive Volume"
+else:
+    obv_signal = "Negative Volume"
+
 # Function to get the color based on the signal
 def get_signal_color(signal):
     if "Buy" in signal:
@@ -328,7 +364,11 @@ st.markdown("""
     </thead>
     <tbody>
         <tr>
-            <td>RSI and MACD</td>
+            <td>RSI</td>
+            <td style='color:{};'>{}</td>
+        </tr>
+        <tr>
+            <td>MACD</td>
             <td style='color:{};'>{}</td>
         </tr>
         <tr>
@@ -347,20 +387,31 @@ st.markdown("""
             <td>EMA</td>
             <td style='color:{};'>{}</td>
         </tr>
+        <tr>
+            <td>ATR</td>
+            <td style='color:{};'>{}</td>
+        </tr>
+        <tr>
+            <td>OBV</td>
+            <td style='color:{};'>{}</td>
+        </tr>
     </tbody>
 </table>
 """.format(
-    get_signal_color(rsi_signal + " and " + macd_signal), rsi_signal + " and " + macd_signal,
+    get_signal_color(rsi_signal), rsi_signal,
+    get_signal_color(macd_signal), macd_signal,
     get_signal_color(bollinger_signal), bollinger_signal,
     get_signal_color(stochastic_signal), stochastic_signal,
     get_signal_color(sma_signal), sma_signal,
-    get_signal_color(ema_signal), ema_signal
+    get_signal_color(ema_signal), ema_signal,
+    get_signal_color(atr_signal), atr_signal,
+    get_signal_color(obv_signal), obv_signal
 ), unsafe_allow_html=True)
 
 # Summary of signals
 st.subheader("Summary")
-buy_signals = [rsi_signal, macd_signal, bollinger_signal, stochastic_signal, ema_signal].count("Buy Signal")
-sell_signals = [rsi_signal, macd_signal, bollinger_signal, stochastic_signal, ema_signal].count("Sell Signal")
+buy_signals = [rsi_signal, macd_signal, bollinger_signal, stochastic_signal, sma_signal, ema_signal].count("Buy Signal")
+sell_signals = [rsi_signal, macd_signal, bollinger_signal, stochastic_signal, sma_signal, ema_signal].count("Sell Signal")
 
 if buy_signals > sell_signals:
     st.markdown("<h2 style='color:green'>Overall Signal: Buy</h2>", unsafe_allow_html=True)
