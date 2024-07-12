@@ -360,40 +360,49 @@ st.markdown("""
         <tr>
             <th>Indicator</th>
             <th>Signal</th>
+            <th>Explanation</th>
         </tr>
     </thead>
     <tbody>
         <tr>
             <td>RSI</td>
             <td style='color:{};'>{}</td>
+            <td>RSI below 30 indicates a buy signal as the stock is considered oversold. RSI above 70 indicates a sell signal as the stock is considered overbought.</td>
         </tr>
         <tr>
             <td>MACD</td>
             <td style='color:{};'>{}</td>
+            <td>MACD line crossing above the signal line indicates a buy signal. MACD line crossing below the signal line indicates a sell signal.</td>
         </tr>
         <tr>
             <td>Bollinger Bands</td>
             <td style='color:{};'>{}</td>
+            <td>Price closing below the lower Bollinger Band indicates a buy signal. Price closing above the upper Bollinger Band indicates a sell signal.</td>
         </tr>
         <tr>
             <td>Stochastic Oscillator</td>
             <td style='color:{};'>{}</td>
+            <td>%K line crossing above 20 indicates a buy signal. %K line crossing below 80 indicates a sell signal.</td>
         </tr>
         <tr>
             <td>SMA</td>
             <td style='color:{};'>{}</td>
+            <td>Golden Cross (SMA 50 crossing above SMA 200) indicates a buy signal. Death Cross (SMA 50 crossing below SMA 200) indicates a sell signal.</td>
         </tr>
         <tr>
             <td>EMA</td>
             <td style='color:{};'>{}</td>
+            <td>Golden Cross (EMA 50 crossing above EMA 200) indicates a buy signal. Death Cross (EMA 50 crossing below EMA 200) indicates a sell signal.</td>
         </tr>
         <tr>
             <td>ATR</td>
             <td style='color:{};'>{}</td>
+            <td>High ATR indicates high volatility, suggesting potential large price movements. Low ATR indicates low volatility, suggesting potential smaller price movements.</td>
         </tr>
         <tr>
             <td>OBV</td>
             <td style='color:{};'>{}</td>
+            <td>Positive OBV indicates that volume is higher on up-days compared to down-days, suggesting buying pressure. Negative OBV indicates selling pressure.</td>
         </tr>
     </tbody>
 </table>
