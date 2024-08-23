@@ -78,6 +78,7 @@ if num_selected_players >= 4:
         teams_df = pd.DataFrame(teams)
 
         # Display the teams in a table format without index
-        st.table(teams_df.style.hide_index())
+        teams_df.index = [''] * len(teams_df)  # Remove index by setting it to empty strings
+        st.table(teams_df)
 else:
     st.write("Select at least 4 players to generate teams.")
