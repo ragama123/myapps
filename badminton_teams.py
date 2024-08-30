@@ -97,7 +97,7 @@ def generate_fixtures(teams):
 # Generate the Excel file
 def generate_excel(teams_a, teams_b, fixtures_a, fixtures_b):
     output = BytesIO()
-    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+    writer = pd.ExcelWriter(output, engine='openpyxl')
 
     # Teams
     teams_df = pd.DataFrame({
