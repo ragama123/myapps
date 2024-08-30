@@ -113,7 +113,7 @@ def generate_excel(teams_a, teams_b, fixtures_a, fixtures_b):
     fixtures_df = pd.concat([fixtures_a_df, fixtures_b_df], keys=['Group A', 'Group B']).reset_index(level=0).rename(columns={'level_0': 'Group'})
     fixtures_df.to_excel(writer, sheet_name='Fixtures', index=False)
 
-    writer.save()
+    writer.close()  # Properly close the writer to save the file
     output.seek(0)
     return output
 
