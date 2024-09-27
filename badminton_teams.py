@@ -3,20 +3,18 @@ import pandas as pd
 import random
 from io import BytesIO
 
-# Google Analytics Tracking Code
-st.markdown(
-    """
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-R6T7WXG8D8"></script>
+GA_TRACKING_CODE = """
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-R6T7WXG8D8');
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
 </script>
-    """, unsafe_allow_html=True
-)
+"""
+
+# Insert the Google Analytics script into the Streamlit app
+st.markdown(GA_TRACKING_CODE, unsafe_allow_html=True)
 
 
 # Predefined list of players with their levels
