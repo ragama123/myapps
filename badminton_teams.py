@@ -2,11 +2,11 @@ import streamlit as st
 import pandas as pd
 import random
 from io import BytesIO
-import streamlit.components.v1 as components  # Import the Streamlit components module
 
-# Add the Google Analytics tracking code
-GA_TRACKING_CODE = """
-<!-- Google tag (gtag.js) -->
+# Google Analytics Tracking Code
+st.markdown(
+    """
+  <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-R6T7WXG8D8"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -15,10 +15,9 @@ GA_TRACKING_CODE = """
 
   gtag('config', 'G-R6T7WXG8D8');
 </script>
-"""
+    """, unsafe_allow_html=True
+)
 
-# Add the Google Analytics script to the app
-components.html(GA_TRACKING_CODE, height=0)
 
 # Predefined list of players with their levels
 predefined_players = [
