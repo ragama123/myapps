@@ -4,23 +4,20 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objs as go
 from datetime import datetime, timedelta
-import streamlit.components.v1 as components  # Import the Streamlit components module
 
-# Add the Google Analytics tracking code
-GA_TRACKING_CODE = """
-<!-- Google tag (gtag.js) -->
+# Google Analytics Tracking Code
+st.markdown(
+    """
+   <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-R6T7WXG8D8"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-R6T7WXG8D8');
 </script>
-"""
-
-# Add the Google Analytics script to the app
-components.html(GA_TRACKING_CODE, height=0)
+    """, unsafe_allow_html=True
+)
 
 # Predefined list of stock codes with company names
 stock_list = {
