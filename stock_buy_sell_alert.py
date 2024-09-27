@@ -4,6 +4,23 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objs as go
 from datetime import datetime, timedelta
+import streamlit.components.v1 as components  # Import the Streamlit components module
+
+# Add the Google Analytics tracking code
+GA_TRACKING_CODE = """
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-R6T7WXG8D8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-R6T7WXG8D8');
+</script>
+"""
+
+# Add the Google Analytics script to the app
+components.html(GA_TRACKING_CODE, height=0)
 
 # Predefined list of stock codes with company names
 stock_list = {
@@ -56,15 +73,16 @@ selected_stock = st.selectbox(
 )
 
 custom_stock = st.text_input(
-    "Or type a custom Stock Code (e.g. INFY.NS, LICI.NS, CDSL.NS, LTIM.NS...etc)",
+    "Or type a custom Stock Code (e.g. INFY, LICI, CDSL, LTIM...etc)",
     value=st.session_state.custom_stock,
     key="custom_stock",
     on_change=clear_selected_stock
 )
 
-# Logic to update stock code based on user interaction
+# Modify custom stock code to handle .NS automatically
 if custom_stock:
-    stock_code = custom_stock
+    # Remove any existing ".NS" and then append ".NS"
+    stock_code = custom_stock.upper().replace(".NS", "") + ".NS"
 else:
     stock_code = selected_stock if selected_stock != "Choose from here" else None
 
