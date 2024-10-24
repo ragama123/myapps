@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 import requests
 import streamlit.components.v1 as components
 
+
 # GA4 Measurement ID and API secret
 GA_MEASUREMENT_ID = 'G-R6T7WXG8D8'  # Replace with your GA4 Measurement ID
 API_SECRET = '_V0F0xoVTZihnVZhUXa4UA'  # Replace with your API secret
@@ -56,10 +57,6 @@ page_url = st.session_state['page_url']
 
 # Send a pageview event when the app loads
 send_ga_event(client_id, 'page_view', page_name, page_url)
-
-# Initialize 'custom_stock' if it's not already in session_state
-if 'custom_stock' not in st.session_state:
-    st.session_state['custom_stock'] = ""
 
 # Predefined list of stock codes with company names
 stock_list = {
