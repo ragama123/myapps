@@ -4,8 +4,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objs as go
 from datetime import datetime, timedelta
-import requests
-import streamlit.components.v1 as components
+
 
 # Google Analytics Tracking Code
 st.markdown(
