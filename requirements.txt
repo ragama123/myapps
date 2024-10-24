@@ -15,6 +15,4 @@ nltk
 openpyxl
 yfinance
 numpy
-plotly==5.5.0
-requests
-
+plotly
