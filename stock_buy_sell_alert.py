@@ -4,20 +4,59 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objs as go
 from datetime import datetime, timedelta
+import requests
+import streamlit.components.v1 as components
 
-# Google Analytics Tracking Code
-st.markdown(
-    """
-   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-R6T7WXG8D8"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-R6T7WXG8D8');
-</script>
-    """, unsafe_allow_html=True
-)
+
+# GA4 Measurement ID and API secret
+GA_MEASUREMENT_ID = 'G-R6T7WXG8D8'  # Replace with your GA4 Measurement ID
+API_SECRET = '_V0F0xoVTZihnVZhUXa4UA'  # Replace with your API secret
+
+# Function to send data to Google Analytics
+def send_ga_event(client_id, event_name, page_name, page_url):
+    url = f'https://www.google-analytics.com/mp/collect?measurement_id={GA_MEASUREMENT_ID}&api_secret={API_SECRET}'
+    payload = {
+        'client_id': client_id,
+        'events': [{
+            'name': event_name,
+            'params': {
+                'engagement_time_msec': '100',
+                'session_id': client_id,
+                'page_title': page_name,
+                'page_location': page_url
+            }
+        }]
+    }
+    response = requests.post(url, json=payload)
+    return response.status_code
+
+# JavaScript to capture page title and URL
+components.html("""
+    <script>
+    const pageTitle = document.title;
+    const pageURL = window.location.href;
+    const pageData = { title: pageTitle, url: pageURL };
+    window.parent.postMessage(pageData, "*");
+    </script>
+""", height=0)
+
+# Initialize 'client_id' in session_state if not already set
+if 'client_id' not in st.session_state:
+    st.session_state['client_id'] = str(datetime.timestamp(datetime.now()))
+
+client_id = st.session_state['client_id']
+
+# Handle page name and URL received from JavaScript
+if 'page_name' not in st.session_state:
+    st.session_state['page_name'] = "Unknown Page"
+if 'page_url' not in st.session_state:
+    st.session_state['page_url'] = "Unknown URL"
+
+page_name = st.session_state['page_name']
+page_url = st.session_state['page_url']
+
+# Send a pageview event when the app loads
+send_ga_event(client_id, 'page_view', page_name, page_url)
 
 # Predefined list of stock codes with company names
 stock_list = {
