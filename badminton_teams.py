@@ -35,6 +35,10 @@ predefined_players = [
     {"name": "Ganapati", "level": 4},
     {"name": "Kundan", "level": 4},
     {"name": "Manish", "level": 4},
+    {"name": "Ganapati", "level": 4},
+    {"name": "Chetan", "level": 4},
+    {"name": "Dheeru (DK)", "level": 4},
+    {"name": "Brij", "level": 4},
     {"name": "Extra_Player1", "level": 4},
     {"name": "Extra_Player2", "level": 4}
 ]
