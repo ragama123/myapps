@@ -16,3 +16,4 @@ openpyxl
 yfinance
 numpy
 plotly
+ta
