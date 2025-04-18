@@ -5,7 +5,7 @@ import ta
 import plotly.graph_objects as go
 
 st.set_page_config(layout="wide")
-st.title("📈 Intraday Trading Buy/Sell Signal")
+st.markdown("<h3 style='font-size:35px; color:#333;'>📈 Intraday Trading Buy/Sell Signal</h3>", unsafe_allow_html=True)
 
 # --- Sidebar Inputs ---
 st.sidebar.markdown("## Select or Enter a Stock")
@@ -317,7 +317,9 @@ if tickers:
         st.subheader(f"📌 {ticker}")
 
         # --- Part 1: Chart & Metrics for selected interval ---
-        st.markdown(f"### 📈 {interval} View with Indicators")
+        st.markdown(f"<h4 style='font-size:18px; margin-bottom:10px;'>📈 {interval} View with Indicators</h4>", unsafe_allow_html=True
+)
+
 
         try:
             df = fetch_data(ticker, interval, limit)
@@ -431,7 +433,7 @@ if tickers:
 # --- Part 4: Multi-Stock Consolidated Recommendation Table ---
 # --- Final Summary Table for Predefined Stocks (Always Shown) ---
 st.markdown("---")
-st.markdown("## 📊 Stock Wise Summary")
+st.markdown("<h3 style='font-size:30px; color:#333;'>📊 Stock Wise Summary</h3>", unsafe_allow_html=True)
 
 predefined_stocks = ['^NSEI', 'BSE.NS', 'KAYNES.NS', 'INFY.NS', 'CANBK.NS', 'LICI.NS','ICICIBANK.NS','NMDC.NS','GMDCLTD.NS',
                      'RVNL.NS','INDUSINDBK.NS','MAZDOCK.NS', 'HDFCBANK.NS', 'VEDL.NS','HINDZINC.NS']
