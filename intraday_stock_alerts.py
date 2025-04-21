@@ -3,6 +3,9 @@ import yfinance as yf
 import pandas as pd
 import ta
 import plotly.graph_objects as go
+from datetime import datetime, timedelta
+from streamlit_autorefresh import st_autorefresh
+
 
 st.set_page_config(layout="wide")
 st.markdown("<h3 style='font-size:35px; color:#333;'>📈 Intraday Trading Buy/Sell Signal</h3>", unsafe_allow_html=True)
@@ -13,14 +16,21 @@ st.sidebar.markdown("## Select or Enter a Stock")
 # --- Stock Label to Actual Mapping
 stock_display_to_actual = {
     "^NSEI": "^NSEI",
-    "BSE": "BSE.NS",
-    "KAYNES": "KAYNES.NS",
-    "INFY": "INFY.NS",
-    "CANBK": "CANBK.NS",
-    "LICI": "LICI.NS",
-    "MAZDOCK": "MAZDOCK.NS",
-    "HDFCBANK": "HDFCBANK.NS",
-    "VEDL": "VEDL.NS"
+    "ADANIENT": "ADANIENT.NS", 
+    "ADANIPORTS": "ADANIPORTS.NS", "APOLLOHOSP": "APOLLOHOSP.NS", 
+    "ASIANPAINT": "ASIANPAINT.NS", "AXISBANK": "AXISBANK.NS", 
+    "BAJAJ-AUTO": "BAJAJ-AUTO.NS", "BAJFINANCE": "BAJFINANCE.NS", 
+    "BAJAJFINSV": "BAJAJFINSV.NS", "BEL": "BEL.NS", "BHARTIARTL": "BHARTIARTL.NS", 
+    "CIPLA": "CIPLA.NS", "COALINDIA": "COALINDIA.NS", "DRREDDY": "DRREDDY.NS", "EICHERMOT": "EICHERMOT.NS", 
+    "ETERNAL": "ETERNAL.NS", "GRASIM": "GRASIM.NS", "HCLTECH": "HCLTECH.NS", "HDFCBANK": "HDFCBANK.NS", 
+    "HDFCLIFE": "HDFCLIFE.NS", "HEROMOTOCO": "HEROMOTOCO.NS", "HINDALCO": "HINDALCO.NS", "HINDUNILVR": "HINDUNILVR.NS", 
+    "ICICIBANK": "ICICIBANK.NS", "ITC": "ITC.NS", "INDUSINDBK": "INDUSINDBK.NS", "INFY": "INFY.NS", 
+    "JSWSTEEL": "JSWSTEEL.NS", "JIOFIN": "JIOFIN.NS", "KOTAKBANK": "KOTAKBANK.NS", "LT": "LT.NS", 
+    "M&M": "M&M.NS", "MARUTI": "MARUTI.NS", "NTPC": "NTPC.NS", "NESTLEIND": "NESTLEIND.NS", 
+    "ONGC": "ONGC.NS", "POWERGRID": "POWERGRID.NS", "RELIANCE": "RELIANCE.NS", "SBILIFE": "SBILIFE.NS", 
+    "SHRIRAMFIN": "SHRIRAMFIN.NS", "SBIN": "SBIN.NS", "SUNPHARMA": "SUNPHARMA.NS", "TCS": "TCS.NS", 
+    "TATACONSUM": "TATACONSUM.NS", "TATAMOTORS": "TATAMOTORS.NS", "TATASTEEL": "TATASTEEL.NS", "TECHM": "TECHM.NS", 
+    "TITAN": "TITAN.NS", "TRENT": "TRENT.NS", "ULTRACEMCO": "ULTRACEMCO.NS", "WIPRO": "WIPRO.NS", "VEDL": "VEDL.NS", "LIC": "LICI.NS"
 }
 stock_options = list(stock_display_to_actual.keys())  # UI labels without .NS
 
@@ -430,50 +440,153 @@ if tickers:
             st.warning(overall)
 
 
-# --- Part 4: Multi-Stock Consolidated Recommendation Table ---
-# --- Final Summary Table for Predefined Stocks (Always Shown) ---
-st.markdown("---")
-st.markdown("<h3 style='font-size:30px; color:#333;'>📊 Stock Wise Summary</h3>", unsafe_allow_html=True)
+def show_intraday_stock_summary():
+    # --- Part 4: Multi-Stock Consolidated Recommendation Table ---
+    # --- Final Summary Table for Predefined Stocks (Always Shown) ---
+    st.markdown("---")
+    st.markdown("<h3 style='font-size:30px; color:#333;'>📊 Stock Wise Summary (Intra Day Signals)</h3>", unsafe_allow_html=True)
 
-predefined_stocks = ['^NSEI', 'BSE.NS', 'KAYNES.NS', 'INFY.NS', 'CANBK.NS', 'LICI.NS','ICICIBANK.NS','NMDC.NS','GMDCLTD.NS',
-                     'RVNL.NS','INDUSINDBK.NS','MAZDOCK.NS', 'HDFCBANK.NS', 'VEDL.NS','HINDZINC.NS']
-summary_rows = []
+    predefined_stocks = ['^NSEI', 'ADANIENT.NS', 'ADANIPORTS.NS', 'APOLLOHOSP.NS', 'ASIANPAINT.NS', 'AXISBANK.NS', 
+                        'BAJAJ-AUTO.NS', 'BAJFINANCE.NS', 'BAJAJFINSV.NS', 'BEL.NS', 'BHARTIARTL.NS', 'CIPLA.NS', 
+                        'COALINDIA.NS', 'DRREDDY.NS', 'EICHERMOT.NS', 'ETERNAL.NS', 'GRASIM.NS', 'HCLTECH.NS', 'HDFCBANK.NS', 
+                        'HDFCLIFE.NS', 'HEROMOTOCO.NS', 'HINDALCO.NS', 'HINDUNILVR.NS', 'ICICIBANK.NS', 'ITC.NS', 
+                        'INDUSINDBK.NS', 'INFY.NS', 'JSWSTEEL.NS', 'JIOFIN.NS', 'KOTAKBANK.NS', 'LT.NS', 'M&M.NS', 'MARUTI.NS', 
+                        'NTPC.NS', 'NESTLEIND.NS', 'ONGC.NS', 'POWERGRID.NS', 'RELIANCE.NS', 'SBILIFE.NS', 'SHRIRAMFIN.NS', 
+                        'SBIN.NS', 'SUNPHARMA.NS', 'TCS.NS', 'TATACONSUM.NS', 'TATAMOTORS.NS', 'TATASTEEL.NS', 'TECHM.NS', 
+                        'TITAN.NS', 'TRENT.NS', 'ULTRACEMCO.NS', 'WIPRO.NS', 'VEDL.NS', 'LICI.NS', 'NMDC.NS', 'CDSL.NS', 'BSE.NS','CANBK.NS', 'RVNL.NS']
+    summary_rows = []
 
-for ticker in predefined_stocks:
-    try:
-        multi_signals = {}
-        last_pattern = "None"
+    for ticker in predefined_stocks:
+        try:
+            multi_signals = {}
+            last_pattern = "None"
 
-        for intv in ['1m', '5m', '15m']:
-            df = fetch_data(ticker, intv, 150)
-            df = add_indicators(df)
-            df = detect_candlestick_pattern(df)
-            _, action = generate_signals(df)
-            multi_signals[intv] = action
-            last_pattern = df['Candle_Pattern'].iloc[-1] if 'Candle_Pattern' in df.columns else "None"
+            for intv in ['1m', '5m', '15m']:
+                df = fetch_data(ticker, intv, 150)
+                df = add_indicators(df)
+                df = detect_candlestick_pattern(df)
+                _, action = generate_signals(df)
+                multi_signals[intv] = action
+                last_pattern = df['Candle_Pattern'].iloc[-1] if 'Candle_Pattern' in df.columns else "None"
 
-        final_verdict = compute_weighted_score(multi_signals)
+            final_verdict = compute_weighted_score(multi_signals)
 
-        summary_rows.append({
-            "Stock": ticker,
-            "1m Signal": multi_signals.get("1m", "N/A"),
-            "5m Signal": multi_signals.get("5m", "N/A"),
-            "15m Signal": multi_signals.get("15m", "N/A"),
-            "Pattern": last_pattern,
-            "Verdict": final_verdict
-        })
+            df_latest = yf.download(ticker, period="1d", interval="1m")
+            last_price = float(df_latest['Close'].iloc[-1]) if not df_latest.empty else None
 
-    except Exception as e:
-        summary_rows.append({
-            "Stock": ticker,
-            "1m Signal": "❌ Error",
-            "5m Signal": "❌ Error",
-            "15m Signal": "❌ Error",
-            "Pattern": "Error",
-            "Verdict": str(e)
-        })
+            summary_rows.append({
+                "Stock": ticker,
+                "Last Price": f"₹{last_price:,.2f}" if last_price else "N/A",
+                "1m Signal": multi_signals.get("1m", "N/A"),
+                "5m Signal": multi_signals.get("5m", "N/A"),
+                "15m Signal": multi_signals.get("15m", "N/A"),
+                "Pattern": last_pattern,
+                "Verdict": final_verdict
+            })
 
-# ✅ Render the table — always visible
-if summary_rows:
-    summary_df = pd.DataFrame(summary_rows)
-    st.dataframe(summary_df, use_container_width=True)
+        except Exception as e:
+            summary_rows.append({
+                "Stock": ticker,
+                "1m Signal": "❌ Error",
+                "5m Signal": "❌ Error",
+                "15m Signal": "❌ Error",
+                "Pattern": "Error",
+                "Verdict": str(e)
+            })
+
+    # ✅ Render the table — always visible
+    if summary_rows:
+        summary_df = pd.DataFrame(summary_rows)
+        st.dataframe(summary_df, use_container_width=True)
+
+
+def show_daily_stock_summary():
+    st.title("📈 Swing Trade Screener (Daily)")
+    # --- Define stock list (you can expand this)
+    nifty_stocks = ['^NSEI', 'ADANIENT.NS', 'ADANIPORTS.NS', 'APOLLOHOSP.NS', 'ASIANPAINT.NS', 'AXISBANK.NS', 
+                        'BAJAJ-AUTO.NS', 'BAJFINANCE.NS', 'BAJAJFINSV.NS', 'BEL.NS', 'BHARTIARTL.NS', 'CIPLA.NS', 
+                        'COALINDIA.NS', 'DRREDDY.NS', 'EICHERMOT.NS', 'ETERNAL.NS', 'GRASIM.NS', 'HCLTECH.NS', 'HDFCBANK.NS', 
+                        'HDFCLIFE.NS', 'HEROMOTOCO.NS', 'HINDALCO.NS', 'HINDUNILVR.NS', 'ICICIBANK.NS', 'ITC.NS', 
+                        'INDUSINDBK.NS', 'INFY.NS', 'JSWSTEEL.NS', 'JIOFIN.NS', 'KOTAKBANK.NS', 'LT.NS', 'M&M.NS', 'MARUTI.NS', 
+                        'NTPC.NS', 'NESTLEIND.NS', 'ONGC.NS', 'POWERGRID.NS', 'RELIANCE.NS', 'SBILIFE.NS', 'SHRIRAMFIN.NS', 
+                        'SBIN.NS', 'SUNPHARMA.NS', 'TCS.NS', 'TATACONSUM.NS', 'TATAMOTORS.NS', 'TATASTEEL.NS', 'TECHM.NS', 
+                        'TITAN.NS', 'TRENT.NS', 'ULTRACEMCO.NS', 'WIPRO.NS', 'VEDL.NS', 'LICI.NS', 'NMDC.NS', 'CDSL.NS', 'BSE.NS','CANBK.NS', 'RVNL.NS'
+    ]
+
+    # --- Date range
+    end_date = datetime.today()
+    start_date = end_date - timedelta(days=60)
+
+    # --- Screener result list
+    screener_results = []
+
+    with st.spinner("⏳ Scanning stocks..."):
+
+        # --- Show full scan data ---
+        full_data = []
+
+        for ticker in nifty_stocks:
+            try:
+                df = yf.download(ticker, start=start_date, end=end_date, interval='1d')
+                df.dropna(inplace=True)
+
+                if len(df) < 30:
+                    continue
+
+                close_series = pd.Series(df['Close'].to_numpy().flatten(), index=df.index)
+                volume_series = pd.Series(df['Volume'].to_numpy().flatten(), index=df.index)
+
+                df['EMA20'] = ta.trend.EMAIndicator(close=close_series, window=20).ema_indicator()
+                df['EMA50'] = ta.trend.EMAIndicator(close=close_series, window=50).ema_indicator()
+                df['RSI'] = ta.momentum.RSIIndicator(close=close_series, window=14).rsi()
+                df['AvgVolume10'] = volume_series.rolling(10).mean()
+
+                price = float(df['Close'].iloc[-1])
+                ema20 = float(df['EMA20'].iloc[-1])
+                ema50 = float(df['EMA50'].iloc[-1])
+                rsi = float(df['RSI'].iloc[-1])
+                vol = float(df['Volume'].iloc[-1])
+                avg_vol = float(df['AvgVolume10'].iloc[-1])
+
+                volume_spike = vol > 1.5 * avg_vol
+                uptrend = price > ema20 and price > ema50
+                rsi_zone = 45 <= rsi <= 65
+
+                signal = "✅ Swing Setup" if uptrend and volume_spike and rsi_zone else "⏳ Watching"
+
+                df_latest = yf.download(ticker, period="1d", interval="1m")
+                last_price = float(df_latest['Close'].iloc[-1]) if not df_latest.empty else None
+
+                full_data.append({
+                    "Stock": ticker,
+                    "Price": f"₹{last_price:,.2f}" if last_price else "N/A",
+                    "EMA20": round(ema20, 2),
+                    "EMA50": round(ema50, 2),
+                    "RSI": round(rsi, 2),
+                    "Volume": f"{int(vol):,}",
+                    "10D Avg Volume": f"{int(avg_vol):,}",
+                    "Volume Spike (%)": round((vol / avg_vol - 1) * 100, 1),
+                    "Swing Signal": signal
+                })
+
+            except Exception as e:
+                full_data.append({
+                    "Stock": ticker,
+                    "Price": "-",
+                    "EMA20": "-",
+                    "EMA50": "-",
+                    "RSI": "-",
+                    "Volume": "-",
+                    "10D Avg Volume": "-",
+                    "Volume Spike (%)": "-",
+                    "Swing Signal": f"⚠️ {str(e).split(':')[0]}"
+                })
+
+    # Display final table
+    df_result = pd.DataFrame(full_data)
+    st.markdown("### 📊 Full Screener Output (All Stocks)")
+    st.dataframe(df_result, use_container_width=True)
+
+show_intraday_stock_summary()
+show_daily_stock_summary()
+
