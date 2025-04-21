@@ -583,7 +583,7 @@ def show_daily_stock_summary():
 
     # Display final table
     df_result = pd.DataFrame(full_data)
-    st.markdown("### 📊 Full Screener Output (All Stocks)")
+    #st.markdown("### 📊 Full Screener Output (All Stocks)")
     st.dataframe(df_result, use_container_width=True)
 
 show_intraday_stock_summary()
