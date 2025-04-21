@@ -4,7 +4,6 @@ import pandas as pd
 import ta
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
-from streamlit_autorefresh import st_autorefresh
 
 
 st.set_page_config(layout="wide")
