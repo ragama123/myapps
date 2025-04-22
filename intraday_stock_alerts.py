@@ -469,59 +469,70 @@ def show_intraday_stock_summary():
 
     summary_rows = []
 
-    for ticker in predefined_stocks:
-        try:
-            multi_signals = {}
-            last_pattern = "None"
+    with st.spinner("⏳ Fetching intraday signals..."):
+        progress_bar = st.progress(0)
+        for i, ticker in enumerate(predefined_stocks):
+            try:
+                multi_signals = {}
+                last_pattern = "None"
 
-            for intv in ['1m', '5m', '15m']:
-                df = fetch_data(ticker, intv, 150)
-                df = add_indicators(df)
-                df = detect_candlestick_pattern(df)
-                _, action = generate_signals(df)
-                multi_signals[intv] = action
-                last_pattern = df['Candle_Pattern'].iloc[-1] if 'Candle_Pattern' in df.columns else "None"
+                for intv in ['1m', '5m', '15m']:
+                    df = fetch_data(ticker, intv, 150)
+                    df = add_indicators(df)
+                    df = detect_candlestick_pattern(df)
+                    _, action = generate_signals(df)
+                    multi_signals[intv] = action
+                    last_pattern = df['Candle_Pattern'].iloc[-1] if 'Candle_Pattern' in df.columns else "None"
 
-            final_verdict = compute_weighted_score(multi_signals)
+                final_verdict = compute_weighted_score(multi_signals)
 
-            df_latest = yf.download(ticker, period="1d", interval="1m")
-            if not df_latest.empty:
-                last_price = float(df_latest['Close'].iloc[-1])
-                open_price = float(df_latest['Open'].iloc[0])
-                pct_change = ((last_price - open_price) / open_price) * 100
-                formatted_change = f"{pct_change:+.2f}%"
-                formatted_price = f"₹{last_price:,.2f}"
-            else:
-                formatted_change = "N/A"
-                formatted_price = "N/A"
+                df_latest = yf.download(ticker, period="1d", interval="1m")
+                if not df_latest.empty:
+                    last_price = float(df_latest['Close'].iloc[-1])
+                    open_price = float(df_latest['Open'].iloc[0])
+                    pct_change = ((last_price - open_price) / open_price) * 100
+                    formatted_change = f"{pct_change:+.2f}%"
+                    formatted_price = f"₹{last_price:,.2f}"
+                else:
+                    formatted_change = "N/A"
+                    formatted_price = "N/A"
 
-            summary_rows.append({
-                "Stock": ticker,
-                "Last Price": formatted_price,
-                "Change %": formatted_change,
-                "1m Signal": multi_signals.get("1m", "N/A"),
-                "5m Signal": multi_signals.get("5m", "N/A"),
-                "15m Signal": multi_signals.get("15m", "N/A"),
-                "Pattern": last_pattern,
-                "Verdict": final_verdict
-            })
+                if pct_change > 0:
+                    formatted_change = f"🟢 +{pct_change:.2f}%"
+                elif pct_change < 0:
+                    formatted_change = f"🔻 {pct_change:.2f}%"
+                else:
+                    formatted_change = f"➖ **0.00%**"
 
-        except Exception as e:
-            summary_rows.append({
-                "Stock": ticker,
-                "Last Price": "Error",
-                "Change %": "-",
-                "1m Signal": "❌ Error",
-                "5m Signal": "❌ Error",
-                "15m Signal": "❌ Error",
-                "Pattern": "Error",
-                "Verdict": str(e)
-            })
+                summary_rows.append({
+                    "Stock": ticker,
+                    "Last Price": formatted_price,
+                    "Change %": formatted_change,
+                    "1m Signal": multi_signals.get("1m", "N/A"),
+                    "5m Signal": multi_signals.get("5m", "N/A"),
+                    "15m Signal": multi_signals.get("15m", "N/A"),
+                    "Pattern": last_pattern,
+                    "Verdict": final_verdict
+                })
 
-    # ✅ Render the table — always visible
+            except Exception as e:
+                summary_rows.append({
+                    "Stock": ticker,
+                    "Last Price": "Error",
+                    "Change %": "-",
+                    "1m Signal": "❌ Error",
+                    "5m Signal": "❌ Error",
+                    "15m Signal": "❌ Error",
+                    "Pattern": "Error",
+                    "Verdict": str(e)
+                })
+
+            progress_bar.progress((i + 1) / len(predefined_stocks))
+
     if summary_rows:
         summary_df = pd.DataFrame(summary_rows)
         st.dataframe(summary_df, use_container_width=True)
+
 
 def show_daily_stock_summary():
     st.title("📈 Swing Trade Screener (Daily)")
@@ -541,68 +552,80 @@ def show_daily_stock_summary():
 
     full_data = []
 
-    for ticker in nifty_stocks:
-        try:
-            df = yf.download(ticker, start=start_date, end=end_date, interval='1d')
-            df.dropna(inplace=True)
+    with st.spinner("⏳ Scanning stocks..."):
+        progress_bar = st.progress(0)
+        for i, ticker in enumerate(nifty_stocks):
+            try:
+                df = yf.download(ticker, start=start_date, end=end_date, interval='1d')
+                df.dropna(inplace=True)
 
-            if len(df) < 30:
-                continue
+                if len(df) < 30:
+                    continue
 
-            close_series = pd.Series(df['Close'].to_numpy().flatten(), index=df.index)
-            volume_series = pd.Series(df['Volume'].to_numpy().flatten(), index=df.index)
+                close_series = pd.Series(df['Close'].values.flatten(), index=df.index)
+                volume_series = pd.Series(df['Volume'].values.flatten(), index=df.index)
 
-            df['EMA20'] = ta.trend.EMAIndicator(close=close_series, window=20).ema_indicator()
-            df['EMA50'] = ta.trend.EMAIndicator(close=close_series, window=50).ema_indicator()
-            df['RSI'] = ta.momentum.RSIIndicator(close=close_series, window=14).rsi()
-            df['AvgVolume10'] = volume_series.rolling(10).mean()
+                df['EMA20'] = ta.trend.EMAIndicator(close=close_series, window=20).ema_indicator()
+                df['EMA50'] = ta.trend.EMAIndicator(close=close_series, window=50).ema_indicator()
+                df['RSI'] = ta.momentum.RSIIndicator(close=close_series, window=14).rsi()
+                df['AvgVolume10'] = volume_series.rolling(10).mean()
+
+                price = float(df['Close'].iloc[-1])
+                open_price = float(df['Open'].iloc[-1])
+                ema20 = float(df['EMA20'].iloc[-1])
+                ema50 = float(df['EMA50'].iloc[-1])
+                rsi = float(df['RSI'].iloc[-1])
+                vol = float(df['Volume'].iloc[-1])
+                avg_vol = float(df['AvgVolume10'].iloc[-1])
+
+                price_change_pct = round((price - open_price) / open_price * 100, 2)
+
+                volume_spike = vol > 1.5 * avg_vol
+                uptrend = price > ema20 and price > ema50
+                rsi_zone = 45 <= rsi <= 65
+
+                signal = "✅ Swing Setup" if uptrend and volume_spike and rsi_zone else "⏳ Watching"
+
+                df_latest = yf.download(ticker, period="1d", interval="1m")
+                last_price = float(df_latest['Close'].iloc[-1]) if not df_latest.empty else None
+
+                price_change_pct = round((price - open_price) / open_price * 100, 2)
+                if price_change_pct > 0:
+                    formatted_change = f"🟢 +{price_change_pct:.2f}%"
+                elif price_change_pct < 0:
+                    formatted_change = f"🔻 {price_change_pct:.2f}%"
+                else:
+                    formatted_change = f"➖ 0.00%"
 
 
-            price = float(df['Close'].iloc[-1])
-            open_price = float(df['Open'].iloc[-1])
-            ema20 = float(df['EMA20'].iloc[-1])
-            ema50 = float(df['EMA50'].iloc[-1])
-            rsi = float(df['RSI'].iloc[-1])
-            vol = float(df['Volume'].iloc[-1])
-            avg_vol = float(df['AvgVolume10'].iloc[-1])
+                full_data.append({
+                    "Stock": ticker,
+                    "Price": f"₹{last_price:,.2f}" if last_price else "N/A",
+                    "% Change": formatted_change,
+                    "EMA20": round(ema20, 2),
+                    "EMA 50": round(ema50, 2),
+                    "RSI": round(rsi, 2),
+                    "Volume": f"{int(vol):,}",
+                    "10 D Avg Volume": f"{int(avg_vol):,}",
+                    "Volume Spike (%)": round((vol / avg_vol - 1) * 100, 1),
+                    "Swing Signal": signal
+                })
 
-            price_change_pct = round((price - open_price) / open_price * 100, 2)
+            except Exception as e:
+                full_data.append({
+                    "Stock": ticker,
+                    "Price": "-",
+                    "% Change": "-",
+                    "EMA20": "-",
+                    "EMA 50": "-",
+                    "RSI": "-",
+                    "Volume": "-",
+                    "10 D Avg Volume": "-",
+                    "Volume Spike (%)": "-",
+                    "Swing Signal": f"⚠️ {str(e).split(':')[0]}"
+                })
 
-            volume_spike = vol > 1.5 * avg_vol
-            uptrend = price > ema20 and price > ema50
-            rsi_zone = 45 <= rsi <= 65
-
-            signal = "✅ Swing Setup" if uptrend and volume_spike and rsi_zone else "⏳ Watching"
-
-            df_latest = yf.download(ticker, period="1d", interval="1m")
-            last_price = float(df_latest['Close'].iloc[-1]) if not df_latest.empty else None
-
-            full_data.append({
-                "Stock": ticker,
-                "Price": f"₹{last_price:,.2f}" if last_price else "N/A",
-                "% Change": f"{price_change_pct}%",
-                "EMA20": round(ema20, 2),
-                "EMA 50": round(ema50, 2),
-                "RSI": round(rsi, 2),
-                "Volume": f"{int(vol):,}",
-                "10 D Avg Volume": f"{int(avg_vol):,}",
-                "Volume Spike (%)": round((vol / avg_vol - 1) * 100, 1),
-                "Swing Signal": signal
-            })
-
-        except Exception as e:
-            full_data.append({
-                "Stock": ticker,
-                "Price": "-",
-                "% Change": "-",
-                "EMA20": "-",
-                "EMA50": "-",
-                "RSI": "-",
-                "Volume": "-",
-                "10D Avg Volume": "-",
-                "Volume Spike (%)": "-",
-                "Swing Signal": f"⚠️ {str(e).split(':')[0]}"
-            })
+            progress_bar.progress((i + 1) / len(nifty_stocks))
 
     df_result = pd.DataFrame(full_data)
     st.dataframe(df_result, use_container_width=True)
