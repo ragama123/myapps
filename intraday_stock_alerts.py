@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 # 🔧 Page Configuration
 st.set_page_config(
-    page_title="Intra & Swing Screener 📊",
+    page_title="Intraday & Swing Screener 📊",
     layout="wide",
     initial_sidebar_state="expanded"
 )
