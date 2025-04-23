@@ -548,7 +548,7 @@ def show_daily_stock_summary():
                     'BSE.NS','CANBK.NS', 'RVNL.NS', 'MCX.NS', "ADANIGREEN.NS", "ADANIPOWER.NS", "ADANIENSOL.NS", "VBL.NS"]
 
     end_date = datetime.today()
-    start_date = end_date - timedelta(days=60)
+    start_date = end_date - timedelta(days=90)
 
     full_data = []
 
@@ -569,6 +569,7 @@ def show_daily_stock_summary():
                 df['EMA50'] = ta.trend.EMAIndicator(close=close_series, window=50).ema_indicator()
                 df['RSI'] = ta.momentum.RSIIndicator(close=close_series, window=14).rsi()
                 df['AvgVolume10'] = volume_series.rolling(10).mean()
+                #df.dropna(subset=["EMA20", "EMA50", "RSI", "AvgVolume10"], inplace=True)
 
                 price = float(df['Close'].iloc[-1])
                 open_price = float(df['Open'].iloc[-1])
@@ -598,6 +599,16 @@ def show_daily_stock_summary():
                     formatted_change = f"➖ 0.00%"
 
 
+                # Determine EMA Trend Bias
+                if price > ema20 and ema20 > ema50:
+                    ema_trend = "🟢 Strong Uptrend"
+                elif price < ema20 and ema20 < ema50:
+                    ema_trend = "🔻 Strong Downtrend"
+                elif price > ema20 and price < ema50:
+                    ema_trend = "🟡 Weak Pullback"
+                else:
+                    ema_trend = "⏸️ Sideways/Unclear"
+
                 full_data.append({
                     "Stock": ticker,
                     "Price": f"₹{last_price:,.2f}" if last_price else "N/A",
@@ -608,8 +619,10 @@ def show_daily_stock_summary():
                     "Volume": f"{int(vol):,}",
                     "10 D Avg Volume": f"{int(avg_vol):,}",
                     "Volume Spike (%)": round((vol / avg_vol - 1) * 100, 1),
-                    "Swing Signal": signal
+                    "Swing Signal": signal,
+                    "EMA Trend": ema_trend  # ✅ New column added here
                 })
+
 
             except Exception as e:
                 full_data.append({
