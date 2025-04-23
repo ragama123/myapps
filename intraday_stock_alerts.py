@@ -5,8 +5,15 @@ import ta
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
 
+# 🔧 Page Configuration
+st.set_page_config(
+    page_title="Intra & Swing Screener 📊",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-st.set_page_config(layout="wide")
+
+#st.set_page_config(layout="wide")
 st.markdown("<h3 style='font-size:35px; color:#333;'>📈 Intraday Trading Buy/Sell Signal</h3>", unsafe_allow_html=True)
 
 # --- Sidebar Inputs ---
