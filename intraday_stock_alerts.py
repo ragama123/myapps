@@ -37,7 +37,7 @@ stock_display_to_actual = {
     "SHRIRAMFIN": "SHRIRAMFIN.NS", "SBIN": "SBIN.NS", "SUNPHARMA": "SUNPHARMA.NS", "TCS": "TCS.NS", 
     "TATACONSUM": "TATACONSUM.NS", "TATAMOTORS": "TATAMOTORS.NS", "TATASTEEL": "TATASTEEL.NS", "TECHM": "TECHM.NS", 
     "TITAN": "TITAN.NS", "TRENT": "TRENT.NS", "ULTRACEMCO": "ULTRACEMCO.NS", "WIPRO": "WIPRO.NS", "VEDL": "VEDL.NS", 
-    "LIC": "LICI.NS", "MCX": "MCX.NS", "ADANIENT": "ADANIENT.NS", "ADANIGREEN": "ADANIGREEN.NS", "ADANIPOWER": "ADANIPOWER.NS",
+    "LIC": "LICI.NS", "MCX": "MCX.NS", "ADANIGREEN": "ADANIGREEN.NS", "ADANIPOWER": "ADANIPOWER.NS",
     "ADANIENSOL": "ADANIENSOL.NS", "VBL": "VBL.NS"
 }
 stock_options = list(stock_display_to_actual.keys())  # UI labels without .NS
@@ -472,7 +472,7 @@ def show_intraday_stock_summary():
                          'NTPC.NS', 'NESTLEIND.NS', 'ONGC.NS', 'POWERGRID.NS', 'RELIANCE.NS', 'SBILIFE.NS', 'SHRIRAMFIN.NS',
                          'SBIN.NS', 'SUNPHARMA.NS', 'TCS.NS', 'TATACONSUM.NS', 'TATAMOTORS.NS', 'TATASTEEL.NS', 'TECHM.NS',
                          'TITAN.NS', 'TRENT.NS', 'ULTRACEMCO.NS', 'WIPRO.NS', 'VEDL.NS', 'LICI.NS', 'NMDC.NS', 'CDSL.NS', 'BSE.NS',
-                         'CANBK.NS', 'RVNL.NS', 'MCX.NS', "ADANIENT.NS", "ADANIGREEN.NS", "ADANIPOWER.NS", "ADANIENSOL.NS", "VBL.NS"]
+                         'CANBK.NS', 'RVNL.NS', 'MCX.NS', "ADANIGREEN.NS", "ADANIPOWER.NS", "ADANIENSOL.NS", "VBL.NS"]
 
     summary_rows = []
 
