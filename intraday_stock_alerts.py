@@ -472,7 +472,9 @@ def show_intraday_stock_summary():
                          'NTPC.NS', 'NESTLEIND.NS', 'ONGC.NS', 'POWERGRID.NS', 'RELIANCE.NS', 'SBILIFE.NS', 'SHRIRAMFIN.NS',
                          'SBIN.NS', 'SUNPHARMA.NS', 'TCS.NS', 'TATACONSUM.NS', 'TATAMOTORS.NS', 'TATASTEEL.NS', 'TECHM.NS',
                          'TITAN.NS', 'TRENT.NS', 'ULTRACEMCO.NS', 'WIPRO.NS', 'VEDL.NS', 'LICI.NS', 'NMDC.NS', 'CDSL.NS', 'BSE.NS',
-                         'CANBK.NS', 'RVNL.NS', 'MCX.NS', "ADANIGREEN.NS", "ADANIPOWER.NS", "ADANIENSOL.NS", "VBL.NS"]
+                         'CANBK.NS', 'RVNL.NS', 'MCX.NS', "ADANIGREEN.NS", "ADANIPOWER.NS", "ADANIENSOL.NS", "VBL.NS", "GMDCLTD.NS", "INDIGO.NS", 
+                         "IRCTC.NS", "MAZDOCK.NS", "COCHINSHIP.NS", "GESHIP.NS", "GRSE.NS", "YESBANK.NS", "POLYCAB.NS", "LTIM.NS", "IOC.NS", "BPCL.NS", 
+                         "ONGC.NS", "HINDPETRO.NS", "ACC.NS", "AMBUJACEM.BO"]
 
     summary_rows = []
 
@@ -552,7 +554,9 @@ def show_daily_stock_summary():
                     'NTPC.NS', 'NESTLEIND.NS', 'ONGC.NS', 'POWERGRID.NS', 'RELIANCE.NS', 'SBILIFE.NS', 'SHRIRAMFIN.NS', 
                     'SBIN.NS', 'SUNPHARMA.NS', 'TCS.NS', 'TATACONSUM.NS', 'TATAMOTORS.NS', 'TATASTEEL.NS', 'TECHM.NS', 
                     'TITAN.NS', 'TRENT.NS', 'ULTRACEMCO.NS', 'WIPRO.NS', 'VEDL.NS', 'LICI.NS', 'NMDC.NS', 'CDSL.NS', 
-                    'BSE.NS','CANBK.NS', 'RVNL.NS', 'MCX.NS', "ADANIGREEN.NS", "ADANIPOWER.NS", "ADANIENSOL.NS", "VBL.NS"]
+                    'BSE.NS','CANBK.NS', 'RVNL.NS', 'MCX.NS', "ADANIGREEN.NS", "ADANIPOWER.NS", "ADANIENSOL.NS", "VBL.NS", "GMDCLTD.NS", "INDIGO.NS", 
+                    "IRCTC.NS", "MAZDOCK.NS", "COCHINSHIP.NS", "GESHIP.NS", "GRSE.NS", "YESBANK.NS", "POLYCAB.NS", "LTIM.NS", "IOC.NS", "BPCL.NS", 
+                    "ONGC.NS", "HINDPETRO.NS", "ACC.NS", "AMBUJACEM.BO"]
 
     end_date = datetime.today()
     start_date = end_date - timedelta(days=90)
