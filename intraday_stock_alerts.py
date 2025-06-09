@@ -630,9 +630,12 @@ def show_daily_stock_summary():
                     "Volume": f"{int(vol):,}",
                     "10 D Avg Volume": f"{int(avg_vol):,}",
                     "Volume Spike (%)": round((vol / avg_vol - 1) * 100, 1),
+                    "EMA Difference": round(ema20 - ema50, 2),
+                    "EMA Difference(%)": round(((ema20 - ema50) / price) * 100, 2),
                     "Swing Signal": signal,
                     "EMA Trend": ema_trend  # ✅ New column added here
                 })
+
 
 
             except Exception as e:
@@ -646,6 +649,8 @@ def show_daily_stock_summary():
                     "Volume": "-",
                     "10 D Avg Volume": "-",
                     "Volume Spike (%)": "-",
+                    "EMA Difference": "-",
+                    "EMA Difference(%)": "-",
                     "Swing Signal": f"⚠️ {str(e).split(':')[0]}"
                 })
 
