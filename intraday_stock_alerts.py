@@ -556,7 +556,7 @@ def show_daily_stock_summary():
                     'TITAN.NS', 'TRENT.NS', 'ULTRACEMCO.NS', 'WIPRO.NS', 'VEDL.NS', 'LICI.NS', 'NMDC.NS', 'CDSL.NS', 
                     'BSE.NS','CANBK.NS', 'RVNL.NS', 'MCX.NS', "ADANIGREEN.NS", "ADANIPOWER.NS", "ADANIENSOL.NS", "VBL.NS", "GMDCLTD.NS", "INDIGO.NS", 
                     "IRCTC.NS", "MAZDOCK.NS", "COCHINSHIP.NS", "GESHIP.NS", "GRSE.NS", "YESBANK.NS", "POLYCAB.NS", "LTIM.NS", "IOC.NS", "BPCL.NS", 
-                    "ONGC.NS", "HINDPETRO.NS", "ACC.NS", "AMBUJACEM.NS"]
+                    "HINDPETRO.NS", "ACC.NS", "AMBUJACEM.NS"]
 
     end_date = datetime.today()
     start_date = end_date - timedelta(days=90)
