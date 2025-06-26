@@ -125,8 +125,8 @@ if st.session_state.analyzed:
             }).reset_index().rename(columns={"DATE1": "OBS_DAYS"})
 
             summary["SIGNAL"] = summary.apply(
-                lambda row: "📈 Bullish" if row["DELIV_PER"] > 60 and row["% CHANGE"] > 1
-                else "😐 Neutral" if row["DELIV_PER"] >= 50 else "⚠️ Caution", axis=1
+                lambda row: "🟢 Bullish" if row["DELIV_PER"] > 60 and row["% CHANGE"] > 1
+                else "🟡 Neutral" if row["DELIV_PER"] >= 50 else "🔻 Caution", axis=1
             )
             summary = pd.merge(summary, latest, on="SYMBOL", how="left")
             summary[["% CHANGE", "DELIV_PER", "LATEST % CHANGE", "LATEST DELIVERY %", "LATEST CLOSE PRICE"]] = summary[
@@ -212,15 +212,18 @@ if st.session_state.analyzed:
             avg_delivery = pa_df["DELIV_PER"].mean()
 
             if bullish_days >= 3 and avg_change > 1 and avg_delivery > 50:
-                final_call = "📈 Bullish"
+                final_call = "🟢 Bullish"
                 reason = f"{bullish_days}/5 Bullish candles, Avg % Change = {avg_change:.2f}%, Avg Delivery = {avg_delivery:.2f}%"
             elif bearish_days >= 3 and avg_change < -1 and avg_delivery < 40:
-                final_call = "📉 Bearish"
+                final_call = "🔻 Bearish"
                 reason = f"{bearish_days}/5 Bearish candles, Avg % Change = {avg_change:.2f}%, Avg Delivery = {avg_delivery:.2f}%"
             else:
-                final_call = "😐 Neutral"
+                final_call = "🟡 Neutral"
                 reason = f"Mixed signals – Avg % Change = {avg_change:.2f}%, Avg Delivery = {avg_delivery:.2f}%"
 
             st.markdown("---")
             st.markdown(f"### 🧾 Final 5-Day Call for **{selected}**: {final_call}")
             st.caption(f"📌 {reason}")
+
+        
+
