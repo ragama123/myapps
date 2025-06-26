@@ -110,8 +110,13 @@ if st.session_state.analyzed:
         if df.empty:
             st.warning("⚠️ No data available for last 5 trading days.")
         else:
-            latest = df.sort_values("DATE1").groupby("SYMBOL").tail(1)[["SYMBOL", "% CHANGE", "DELIV_PER"]]
-            latest = latest.rename(columns={"% CHANGE": "LATEST % CHANGE", "DELIV_PER": "LATEST DELIVERY %"})
+            latest = df.sort_values("DATE1").groupby("SYMBOL").tail(1)[["SYMBOL", "% CHANGE", "DELIV_PER", "CLOSE_PRICE"]]
+            latest = latest.rename(columns={
+            "% CHANGE": "LATEST % CHANGE",
+            "DELIV_PER": "LATEST DELIVERY %",
+            "CLOSE_PRICE": "LATEST CLOSE PRICE"
+        })
+
 
             summary = df.groupby("SYMBOL").agg({
                 "% CHANGE": "mean",
@@ -124,9 +129,10 @@ if st.session_state.analyzed:
                 else "😐 Neutral" if row["DELIV_PER"] >= 50 else "⚠️ Caution", axis=1
             )
             summary = pd.merge(summary, latest, on="SYMBOL", how="left")
-            summary[["CLOSE_PRICE", "% CHANGE", "DELIV_PER", "LATEST % CHANGE", "LATEST DELIVERY %"]] = summary[
-                ["CLOSE_PRICE", "% CHANGE", "DELIV_PER", "LATEST % CHANGE", "LATEST DELIVERY %"]
+            summary[["% CHANGE", "DELIV_PER", "LATEST % CHANGE", "LATEST DELIVERY %", "LATEST CLOSE PRICE"]] = summary[
+                ["% CHANGE", "DELIV_PER", "LATEST % CHANGE", "LATEST DELIVERY %", "LATEST CLOSE PRICE"]
             ].round(2)
+
 
             # Display Summary
             st.subheader("📌 Signal Summary (Top by Avg % Change)")
@@ -218,6 +224,3 @@ if st.session_state.analyzed:
             st.markdown("---")
             st.markdown(f"### 🧾 Final 5-Day Call for **{selected}**: {final_call}")
             st.caption(f"📌 {reason}")
-
-        
-
