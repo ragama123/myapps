@@ -124,8 +124,8 @@ if st.session_state.analyzed:
                 else "😐 Neutral" if row["DELIV_PER"] >= 50 else "⚠️ Caution", axis=1
             )
             summary = pd.merge(summary, latest, on="SYMBOL", how="left")
-            summary[["% CHANGE", "DELIV_PER", "LATEST % CHANGE", "LATEST DELIVERY %"]] = summary[
-                ["% CHANGE", "DELIV_PER", "LATEST % CHANGE", "LATEST DELIVERY %"]
+            summary[["CLOSE_PRICE", "% CHANGE", "DELIV_PER", "LATEST % CHANGE", "LATEST DELIVERY %"]] = summary[
+                ["CLOSE_PRICE", "% CHANGE", "DELIV_PER", "LATEST % CHANGE", "LATEST DELIVERY %"]
             ].round(2)
 
             # Display Summary
