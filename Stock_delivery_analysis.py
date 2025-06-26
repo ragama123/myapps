@@ -225,5 +225,37 @@ if st.session_state.analyzed:
             st.markdown(f"### 🧾 Final 5-Day Call for **{selected}**: {final_call}")
             st.caption(f"📌 {reason}")
 
-        
+            stock_signals = []
 
+            # Loop through each stock in the summary
+            for symbol in summary["SYMBOL"]:
+                stock_df = df[df["SYMBOL"] == symbol].sort_values("DATE1")
+                
+                if not stock_df.empty:
+                    bullish_days = sum(stock_df["CLOSE_PRICE"] > stock_df["OPEN_PRICE"])
+                    bearish_days = sum(stock_df["CLOSE_PRICE"] < stock_df["OPEN_PRICE"])
+                    avg_change = stock_df["% CHANGE"].mean()
+                    avg_delivery = stock_df["DELIV_PER"].mean()
+
+                    if bullish_days >= 3 and avg_change > 1 and avg_delivery > 50:
+                        final_call = "🟢 Bullish"
+                    elif bearish_days >= 3 and avg_change < -1 and avg_delivery < 40:
+                        final_call = "🔴 Bearish"
+                    else:
+                        final_call = "🟡 Neutral"
+                else:
+                    final_call = "❓ No Data"
+
+                stock_signals.append(final_call)
+
+            # Now this will match length
+            summary["FINAL 5-DAY CALL"] = stock_signals
+
+
+            st.subheader("📌 Signal Summary (Top by Avg % Change)")
+            st.dataframe(
+                    summary.sort_values(by="% CHANGE", ascending=False)[
+                        ["SYMBOL", "% CHANGE", "DELIV_PER", "LATEST % CHANGE", "LATEST DELIVERY %", "LATEST CLOSE PRICE", "SIGNAL", "FINAL 5-DAY CALL"]
+                    ],
+                    use_container_width=True
+                )
