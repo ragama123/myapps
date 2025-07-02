@@ -32,7 +32,7 @@ def main():
             "TATACONSUM": "TATACONSUM.NS", "TATAMOTORS": "TATAMOTORS.NS", "TATASTEEL": "TATASTEEL.NS", "TECHM": "TECHM.NS", 
             "TITAN": "TITAN.NS", "TRENT": "TRENT.NS", "ULTRACEMCO": "ULTRACEMCO.NS", "WIPRO": "WIPRO.NS", "VEDL": "VEDL.NS", 
             "LIC": "LICI.NS", "MCX": "MCX.NS", "ADANIGREEN": "ADANIGREEN.NS", "ADANIPOWER": "ADANIPOWER.NS",
-            "ADANIENSOL": "ADANIENSOL.NS", "VBL": "VBL.NS"
+            "ADANIENSOL": "ADANIENSOL.NS", "VBL": "VBL.NS", "DLF": "DLF.NS"
         }
         stock_options = list(stock_display_to_actual.keys())  # UI labels without .NS
 
