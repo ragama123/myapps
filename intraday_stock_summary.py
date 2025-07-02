@@ -175,7 +175,7 @@ def main():
                             'TITAN.NS', 'TRENT.NS', 'ULTRACEMCO.NS', 'WIPRO.NS', 'VEDL.NS', 'LICI.NS', 'NMDC.NS', 'CDSL.NS', 'BSE.NS',
                             'CANBK.NS', 'RVNL.NS', 'MCX.NS', "ADANIGREEN.NS", "ADANIPOWER.NS", "ADANIENSOL.NS", "VBL.NS", "GMDCLTD.NS", "INDIGO.NS", 
                             "IRCTC.NS", "MAZDOCK.NS", "COCHINSHIP.NS", "GESHIP.NS", "GRSE.NS", "YESBANK.NS", "POLYCAB.NS", "LTIM.NS", "IOC.NS", "BPCL.NS", 
-                            "ONGC.NS", "HINDPETRO.NS", "ACC.NS", "AMBUJACEM.BO"]
+                            "ONGC.NS", "HINDPETRO.NS", "ACC.NS", "AMBUJACEM.NS", "DLF.NS"]
 
         summary_rows = []
 
