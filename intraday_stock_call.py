@@ -104,25 +104,38 @@ def main():
 
 
         # --- Display calculated time span ---
-        # Map interval strings to numeric values in minutes
+                # ✅ Interval-to-minutes mapping
                 interval_to_minutes = {
+                    "1m": 1,
+                    "5m": 5,
+                    "15m": 15,
                     "30m": 30,
                     "1h": 60,
                     "4h": 240,
-                    "1d": 1440,      # 24*60
-                    "1w": 10080,     # 7*24*60
-                    "1mo": 43200,    # ~30*24*60
-                    "3mo": 129600    # ~90*24*60
+                    "1d": 1440,     # 1 day = 24 * 60
+                    "1w": 10080,    # 7 days
+                    "1mo": 43200,   # ~30 days
+                    "3mo": 129600   # ~90 days
                 }
                 
-                # Example interval and limit
-                interval = "1h"
-                limit = 50
+                # 🔁 Sample input
+                interval = "15m"  # Change this as needed
+                limit = 100       # Number of candles
                 
-                # Compute total time span
+                # 🧮 Time calculation
                 total_minutes = interval_to_minutes[interval] * limit
-                hours = total_minutes // 60
+                days = total_minutes // 1440
+                hours = (total_minutes % 1440) // 60
                 minutes = total_minutes % 60
+                
+                # 📝 Nicely formatted duration string
+                duration_str = []
+                if days > 0:
+                    duration_str.append(f"{days}d")
+                if hours > 0:
+                    duration_str.append(f"{hours}h")
+                if minutes > 0:
+                    duration_str.append(f"{minutes}m")
 
 
         st.sidebar.caption(f"🕒 Showing approx: **{hours}h {minutes}m** of data for `{interval}` interval")
