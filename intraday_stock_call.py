@@ -93,7 +93,7 @@ def main():
 
         interval = st.sidebar.selectbox(
             "Select Interval", 
-            ['1m', '5m', '15m'], 
+            ['1m', '5m', '15m', '30m', '60m', '240m', '1d', '1wk', '1mo', '3mo'], 
             index=1
         )
 
@@ -104,7 +104,15 @@ def main():
 
 
         # --- Display calculated time span ---
-        interval_minutes = {"1m": 1, "5m": 5, "15m": 15}
+        interval_minutes = {
+                            "30m": "30m",
+                            "1h": "60m",
+                            "4h": "240m",
+                            "1d": "1d",
+                            "1w": "1wk",
+                            "1mo": "1mo",
+                            "3mo": "3mo"
+                        }
         total_minutes = interval_minutes[interval] * limit
         hours = total_minutes // 60
         minutes = total_minutes % 60
