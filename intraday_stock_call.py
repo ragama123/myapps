@@ -104,18 +104,26 @@ def main():
 
 
         # --- Display calculated time span ---
-        interval_minutes = {
-                            "30m": "30m",
-                            "1h": "60m",
-                            "4h": "240m",
-                            "1d": "1d",
-                            "1w": "1wk",
-                            "1mo": "1mo",
-                            "3mo": "3mo"
-                        }
-        total_minutes = interval_minutes[interval] * limit
-        hours = total_minutes // 60
-        minutes = total_minutes % 60
+        # Map interval strings to numeric values in minutes
+                interval_to_minutes = {
+                    "30m": 30,
+                    "1h": 60,
+                    "4h": 240,
+                    "1d": 1440,      # 24*60
+                    "1w": 10080,     # 7*24*60
+                    "1mo": 43200,    # ~30*24*60
+                    "3mo": 129600    # ~90*24*60
+                }
+                
+                # Example interval and limit
+                interval = "1h"
+                limit = 50
+                
+                # Compute total time span
+                total_minutes = interval_to_minutes[interval] * limit
+                hours = total_minutes // 60
+                minutes = total_minutes % 60
+
 
         st.sidebar.caption(f"🕒 Showing approx: **{hours}h {minutes}m** of data for `{interval}` interval")
 
