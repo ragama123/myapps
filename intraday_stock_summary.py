@@ -221,9 +221,17 @@ def main():
                         "1m Signal": multi_signals.get("1m", "N/A"),
                         "5m Signal": multi_signals.get("5m", "N/A"),
                         "15m Signal": multi_signals.get("15m", "N/A"),
+                        "30m Signal": multi_signals.get("30m", "N/A"),
+                        "1h Signal": multi_signals.get("1h", "N/A"),
+                        "4h Signal": multi_signals.get("4h", "N/A"),
+                        "1d Signal": multi_signals.get("1d", "N/A"),
+                        "1w Signal": multi_signals.get("1w", "N/A"),
+                        "1mo Signal": multi_signals.get("1mo", "N/A"),
+                        "3mo Signal": multi_signals.get("3mo", "N/A"),
                         "Pattern": last_pattern,
                         "Verdict": final_verdict
                     })
+
 
                 except Exception as e:
                     summary_rows.append({
