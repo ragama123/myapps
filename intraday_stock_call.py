@@ -32,7 +32,7 @@ def main():
             "TATACONSUM": "TATACONSUM.NS", "TATAMOTORS": "TATAMOTORS.NS", "TATASTEEL": "TATASTEEL.NS", "TECHM": "TECHM.NS", 
             "TITAN": "TITAN.NS", "TRENT": "TRENT.NS", "ULTRACEMCO": "ULTRACEMCO.NS", "WIPRO": "WIPRO.NS", "VEDL": "VEDL.NS", 
             "LIC": "LICI.NS", "MCX": "MCX.NS", "ADANIGREEN": "ADANIGREEN.NS", "ADANIPOWER": "ADANIPOWER.NS",
-            "ADANIENSOL": "ADANIENSOL.NS", "VBL": "VBL.NS", "DLF": "DLF.NS"
+            "ADANIENSOL": "ADANIENSOL.NS", "VBL": "VBL.NS"
         }
         stock_options = list(stock_display_to_actual.keys())  # UI labels without .NS
 
@@ -93,7 +93,7 @@ def main():
 
         interval = st.sidebar.selectbox(
             "Select Interval", 
-            ['1m', '5m', '15m', '30m', '60m', '240m', '1d', '1wk', '1mo', '3mo'], 
+            ['1m', '5m', '15m'], 
             index=1
         )
 
@@ -104,39 +104,10 @@ def main():
 
 
         # --- Display calculated time span ---
-                # ✅ Interval-to-minutes mapping
-                interval_to_minutes = {
-                    "1m": 1,
-                    "5m": 5,
-                    "15m": 15,
-                    "30m": 30,
-                    "1h": 60,
-                    "4h": 240,
-                    "1d": 1440,     # 1 day = 24 * 60
-                    "1w": 10080,    # 7 days
-                    "1mo": 43200,   # ~30 days
-                    "3mo": 129600   # ~90 days
-                }
-                
-                # 🔁 Sample input
-                interval = "15m"  # Change this as needed
-                limit = 100       # Number of candles
-                
-                # 🧮 Time calculation
-                total_minutes = interval_to_minutes[interval] * limit
-                days = total_minutes // 1440
-                hours = (total_minutes % 1440) // 60
-                minutes = total_minutes % 60
-                
-                # 📝 Nicely formatted duration string
-                duration_str = []
-                if days > 0:
-                    duration_str.append(f"{days}d")
-                if hours > 0:
-                    duration_str.append(f"{hours}h")
-                if minutes > 0:
-                    duration_str.append(f"{minutes}m")
-
+        interval_minutes = {"1m": 1, "5m": 5, "15m": 15}
+        total_minutes = interval_minutes[interval] * limit
+        hours = total_minutes // 60
+        minutes = total_minutes % 60
 
         st.sidebar.caption(f"🕒 Showing approx: **{hours}h {minutes}m** of data for `{interval}` interval")
 
