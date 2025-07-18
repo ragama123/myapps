@@ -3,6 +3,7 @@ from intraday_stock_call import main as intraday_stock_call
 from intraday_stock_summary import main as intraday_stock_summary
 from swing_trade_screener import main as swing_trade_screener
 from Stock_delivery_analysis import main as Stock_delivery_analysis
+from Put_Call_Ratio import main as Put_Call_Ratio
 
 st.set_page_config(
     page_title="Stock Screener - Home 📊",
@@ -46,7 +47,7 @@ def welcome_screen():
 def main():
     # Sidebar navigation
     st.sidebar.title("Stock Screener Models")
-    app_selection = st.sidebar.radio(" ", ["Intraday Stock calls", "Intraday Stocks Summary", "Swing Trade Screener (Daily Refresh)","Stock Delivery Analysis (Daily Refresh)"])
+    app_selection = st.sidebar.radio(" ", ["Intraday Stock calls", "Intraday Stocks Summary", "Swing Trade Screener (Daily Refresh)","Stock Delivery Analysis (Daily Refresh)", "Options Chain Analysis"])
 
     if app_selection == "Intraday Stock calls":
         intraday_stock_call()
@@ -56,6 +57,8 @@ def main():
         swing_trade_screener()
     elif app_selection == "Stock Delivery Analysis (Daily Refresh)":
         Stock_delivery_analysis()
+    elif app_selection == "Options Chain Analysis":
+        Put_Call_Ratio()
     
 if __name__ == "__main__":
     main()
