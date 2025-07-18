@@ -53,7 +53,7 @@ if 'teams_b' not in st.session_state:
     st.session_state.teams_b = []
 
 st.markdown(
-    f"📌 <span style='font-size:28px; color:##FFA500;'>Everyday Badminton - Tournament App</span>",
+    f"🏸 <span style='font-size:28px; color:#FFA500;'>Everyday Badminton - Tournament App</span>",
     unsafe_allow_html=True
 )
 
