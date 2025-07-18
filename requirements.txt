@@ -17,3 +17,4 @@ yfinance
 numpy
 plotly
 ta
+nsepython
