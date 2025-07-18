@@ -52,7 +52,7 @@ if 'teams_a' not in st.session_state:
 if 'teams_b' not in st.session_state:
     st.session_state.teams_b = []
 
-st.markdown(f"<span style='font-size:40px; color:#FFA500; font-weight:bold;'>🏸Everyday Badminton - Tournament App</span>", unsafe_allow_html=True)
+st.markdown(f"<span style='font-size:32px; color:#FFA500; font-weight:bold;'>🏸Everyday Badminton - Tournament App</span>", unsafe_allow_html=True)
 
 # Display the list of predefined players with checkboxes in 3 columns
 st.header("Select Players for the Tournament")
