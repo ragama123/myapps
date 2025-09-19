@@ -40,6 +40,7 @@ predefined_players = [
     {"name": "Brij", "level": 4},
     {"name": "Punith", "level": 4},
     {"name": "Srinivas", "level": 4},
+    {"name": "Lachu", "level": 4}
     {"name": "Extra_Player1", "level": 4},
     {"name": "Extra_Player2", "level": 4}
 ]
@@ -173,3 +174,4 @@ if num_selected_players >= 4 and num_selected_players % 2 == 0:
         st.download_button(label="Download Excel", data=excel_data, file_name='tournament_fixtures.xlsx', mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 else:
     st.write("Select an even number of players to generate teams.")
+
