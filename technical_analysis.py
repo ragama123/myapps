@@ -1004,6 +1004,35 @@ def nearest_zones(zones: List[Zone], current_price: float) -> Tuple[Zone | None,
     return nearest_support, nearest_resistance
 
 
+def get_volatility_label(price: float, atr: float) -> str:
+    if pd.isna(price) or pd.isna(atr):
+        return "N/A"
+
+    if price <= 500:
+        if atr < 1.5:
+            return "Low Volatility"
+        elif atr < 3:
+            return "Medium Volatility"
+        else:
+            return "High Volatility"
+
+    elif price <= 1500:
+        if atr < 5:
+            return "Low Volatility"
+        elif atr < 15:
+            return "Medium Volatility"
+        else:
+            return "High Volatility"
+
+    else:
+        if atr < 10:
+            return "Low Volatility"
+        elif atr < 30:
+            return "Medium Volatility"
+        else:
+            return "High Volatility"
+
+
 # ============================================================
 # TRADE CONFIRMATION ENGINE
 # ============================================================
@@ -1286,6 +1315,54 @@ def evaluate_trade_confirmation(
         retest_buy_ready=retest_buy_ready,
         retest_sell_ready=retest_sell_ready,
     )
+
+
+def get_trade_levels(trade_confirmation: TradeConfirmation, df: pd.DataFrame):
+    latest = df.iloc[-1]
+
+    close_price = float(latest["Close"])
+    high_price = float(latest["High"])
+    low_price = float(latest["Low"])
+    atr = float(latest["ATR"]) if pd.notna(latest["ATR"]) else np.nan
+
+    if pd.isna(atr) or atr <= 0:
+        return None
+
+    signal = trade_confirmation.signal
+
+    if signal in ["Buy", "Strong Buy"]:
+        entry = close_price
+        safe_entry = high_price + (0.2 * atr)
+        stop_loss = entry - (1.5 * atr)
+        target_1 = entry + (1.5 * atr)
+        target_2 = entry + (2.5 * atr)
+
+        return {
+            "side": "BUY",
+            "entry": round(entry, 2),
+            "safe_entry": round(safe_entry, 2),
+            "stop_loss": round(stop_loss, 2),
+            "target_1": round(target_1, 2),
+            "target_2": round(target_2, 2),
+        }
+
+    elif signal in ["Sell", "Strong Sell"]:
+        entry = close_price
+        safe_entry = low_price - (0.2 * atr)
+        stop_loss = entry + (1.5 * atr)
+        target_1 = entry - (1.5 * atr)
+        target_2 = entry - (2.5 * atr)
+
+        return {
+            "side": "SELL",
+            "entry": round(entry, 2),
+            "safe_entry": round(safe_entry, 2),
+            "stop_loss": round(stop_loss, 2),
+            "target_1": round(target_1, 2),
+            "target_2": round(target_2, 2),
+        }
+
+    return None
 
 
 # ============================================================
@@ -1628,6 +1705,8 @@ if run_btn:
             breakout_buffer_pct=breakout_buffer_pct,
         )
 
+        trade_levels = get_trade_levels(trade_confirmation, df)
+
         c1, c2, c3, c4, c5 = st.columns(5)
         last_vol_ratio = vol_summary["latest_vol_ratio"]
         avg_recent_vol_ratio = vol_summary["avg_recent_vol_ratio"]
@@ -1655,6 +1734,28 @@ if run_btn:
             f"Retest Buy Ready: {'Yes' if trade_confirmation.retest_buy_ready else 'No'} | "
             f"Retest Sell Ready: {'Yes' if trade_confirmation.retest_sell_ready else 'No'}"
         )
+
+        if trade_levels is not None:
+            st.markdown("### Recommended Trade Levels")
+            t1, t2, t3, t4, t5 = st.columns(5)
+
+            if trade_levels["side"] == "BUY":
+                t1.metric("Recommended Action", trade_levels["side"])
+                t2.metric("Buy Price", f"{trade_levels['entry']:,.2f}")
+                t3.metric("Safe Buy Above", f"{trade_levels['safe_entry']:,.2f}")
+                t4.metric("Stop Loss", f"{trade_levels['stop_loss']:,.2f}")
+                t5.metric("Target 1", f"{trade_levels['target_1']:,.2f}")
+                st.caption(f"Extended Target 2: {trade_levels['target_2']:,.2f}")
+
+            elif trade_levels["side"] == "SELL":
+                t1.metric("Recommended Action", trade_levels["side"])
+                t2.metric("Sell Price", f"{trade_levels['entry']:,.2f}")
+                t3.metric("Safe Sell Below", f"{trade_levels['safe_entry']:,.2f}")
+                t4.metric("Stop Loss", f"{trade_levels['stop_loss']:,.2f}")
+                t5.metric("Target 1", f"{trade_levels['target_1']:,.2f}")
+                st.caption(f"Extended Target 2: {trade_levels['target_2']:,.2f}")
+
+
 
         fig = build_chart(
             df=df,
@@ -1739,6 +1840,16 @@ if run_btn:
             latest_body = float(abs(latest["Close"] - latest["Open"]))
             body_to_range = (latest_body / latest_range) if latest_range > 0 else np.nan
 
+            latest_close_snapshot = float(latest["Close"]) if pd.notna(latest["Close"]) else np.nan
+            latest_atr_snapshot = float(latest["ATR"]) if pd.notna(latest["ATR"]) else np.nan
+            atr_pct_snapshot = (latest_atr_snapshot / latest_close_snapshot) * 100 if pd.notna(latest_atr_snapshot) and pd.notna(latest_close_snapshot) and latest_close_snapshot != 0 else np.nan
+            atr_vol_label = get_volatility_label(latest_close_snapshot, latest_atr_snapshot)
+            atr_display = (
+                f"{latest_atr_snapshot:.2f} ({atr_pct_snapshot:.2f}% / {atr_vol_label})"
+                if pd.notna(latest_atr_snapshot) and pd.notna(atr_pct_snapshot)
+                else np.nan
+            )
+
             st.subheader("Latest Candle Snapshot")
             candle_stats = pd.DataFrame(
                 {
@@ -1767,7 +1878,7 @@ if run_btn:
                         round(float(latest["RSI"]), 2) if pd.notna(latest["RSI"]) else np.nan,
                         round(float(latest["MACD"]), 4) if pd.notna(latest["MACD"]) else np.nan,
                         round(float(latest["MACD_Signal"]), 4) if pd.notna(latest["MACD_Signal"]) else np.nan,
-                        round(float(latest["ATR"]), 2) if pd.notna(latest["ATR"]) else np.nan,
+                        atr_display,
                         f"{int(latest['Volume']):,}",
                         round(float(latest["Vol_MA"]), 2),
                         round(float(latest["Vol_Ratio"]), 2) if pd.notna(latest["Vol_Ratio"]) else np.nan,
