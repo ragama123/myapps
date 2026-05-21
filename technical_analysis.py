@@ -1367,6 +1367,29 @@ def get_trade_levels(trade_confirmation: TradeConfirmation, df: pd.DataFrame):
     return None
 
 # ============================================================
+# VOLUME STRENGTH LABEL
+# ============================================================
+def get_volume_strength_label(vol_ratio):
+
+    if pd.isna(vol_ratio):
+        return ""
+
+    if vol_ratio < 0.5:
+        return "Very weak participation"
+
+    elif vol_ratio < 1.0:
+        return "Below average volume"
+
+    elif vol_ratio < 1.5:
+        return "Good volume support"
+
+    elif vol_ratio < 2.0:
+        return "Strong participation"
+
+    else:
+        return "Major volume spike"
+
+# ============================================================
 # WATCHLIST ANALYSIS FUNCTION
 # ============================================================
 def analyze_single_symbol(
@@ -1495,9 +1518,12 @@ def analyze_single_symbol(
                 if nearest_resistance else None,
 
             "Volume vs MA":
-                round(vol_summary["latest_vol_ratio"], 2)
+                (
+                    f"{vol_summary['latest_vol_ratio']:.2f} "
+                    f"({get_volume_strength_label(vol_summary['latest_vol_ratio'])})"
+                )
                 if pd.notna(vol_summary["latest_vol_ratio"])
-                else None,
+                else "",
 
             "Structure": market_structure.trend_bias,
 
@@ -1933,7 +1959,6 @@ if run_watchlist_btn:
                 "Current Price",
                 "Nearest Support",
                 "Nearest Resistance",
-                "Volume vs MA",
                 "Confidence",
                 "Buy Score",
                 "Sell Score",
@@ -2422,8 +2447,12 @@ if run_btn:
 else:
     st.info("Set your Upstox token, search the instrument, select it, and click **Run Analysis**.")
     st.info(
-    "If you want accuracy → use: **3mo + 1d**\n\n"
-    "If you want timing + entries → use: **1mo + 1h**.")
+    "📌 Recommended Usage:\n\n"
+    "• Best accuracy → **3mo + 1d**\n\n"
+    "• Best swing entries → **1mo + 1h**\n\n"
+    "• Intraday trading → **5d + 15m**\n\n"
+    "• Positional trading → **6mo + 1d**"
+)
     st.markdown(
         """
 ### What this version includes
