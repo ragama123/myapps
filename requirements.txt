@@ -11,6 +11,7 @@ nltk
 wordcloud
 streamlit-aggrid
 streamlit-lottie
+streamlit-autorefresh
 reportlab
 fpdf
 google-generativeai
