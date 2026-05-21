@@ -10,6 +10,7 @@ import plotly.graph_objects as go
 import requests
 import streamlit as st
 from plotly.subplots import make_subplots
+from streamlit_autorefresh import st_autorefresh
 
 
 # ============================================================
@@ -23,6 +24,7 @@ st.set_page_config(
 
 st.title("📈 Technical Analysis App - Live API")
 st.caption("Support/Resistance zones + trendlines + market structure + volume analysis + buy/sell confirmation")
+
 
 INDIA_TZ = "Asia/Kolkata"
 INDIAN_DATE_FMT = "%d-%m-%Y"
@@ -1364,6 +1366,182 @@ def get_trade_levels(trade_confirmation: TradeConfirmation, df: pd.DataFrame):
 
     return None
 
+# ============================================================
+# WATCHLIST ANALYSIS FUNCTION
+# ============================================================
+def analyze_single_symbol(
+    access_token,
+    symbol,
+    instruments_df,
+    period,
+    interval,
+    lookup_exchange,
+    volume_ma_window,
+    left_bars,
+    right_bars,
+    zone_width_pct,
+    min_touches,
+    trendline_tolerance_pct,
+    include_live,
+    require_trendline_confirmation,
+    use_retest_bonus,
+    breakout_buffer_pct,
+):
+    try:
+
+        matched = filter_instruments(
+            instruments_df=instruments_df,
+            query=symbol,
+            mode="Equity",
+            exchange=lookup_exchange,
+        )
+
+        if matched.empty:
+            return {
+                "Stock": symbol,
+                "Recommended Action": "Not Found",
+            }
+
+        row = matched.iloc[0]
+        instrument_key = row["instrument_key"]
+
+        raw = load_upstox_data(
+            access_token=access_token,
+            instrument_key=instrument_key,
+            period=period,
+            interval=interval,
+            include_live=include_live,
+        )
+
+        if raw.empty:
+            return {
+                "Stock": symbol,
+                "Recommended Action": "No Data",
+            }
+
+        df = compute_volume_metrics(raw, volume_ma_window)
+
+        pivot_highs, pivot_lows = find_pivots(
+            df,
+            left_bars=left_bars,
+            right_bars=right_bars,
+        )
+
+        current_price = float(df["Close"].iloc[-1])
+
+        support_zones = cluster_levels(
+            pivots=pivot_lows,
+            current_price=current_price,
+            zone_width_pct=zone_width_pct,
+            zone_type="Support",
+            min_touches=min_touches,
+        )
+
+        resistance_zones = cluster_levels(
+            pivots=pivot_highs,
+            current_price=current_price,
+            zone_width_pct=zone_width_pct,
+            zone_type="Resistance",
+            min_touches=min_touches,
+        )
+
+        all_zones = support_zones + resistance_zones
+
+        nearest_support, nearest_resistance = nearest_zones(
+            all_zones,
+            current_price,
+        )
+
+        trendlines = detect_trendlines(
+            df=df,
+            pivot_highs=pivot_highs,
+            pivot_lows=pivot_lows,
+            tolerance_pct=trendline_tolerance_pct,
+        )
+
+        market_structure = detect_market_structure(
+            pivot_highs=pivot_highs,
+            pivot_lows=pivot_lows,
+        )
+
+        vol_summary = summarize_volume(df)
+
+        trade_confirmation = evaluate_trade_confirmation(
+            df=df,
+            trendlines=trendlines,
+            market_structure=market_structure,
+            nearest_support=nearest_support,
+            nearest_resistance=nearest_resistance,
+            require_trendline_confirmation=require_trendline_confirmation,
+            use_retest_bonus=use_retest_bonus,
+            breakout_buffer_pct=breakout_buffer_pct,
+        )
+
+        trade_levels = get_trade_levels(
+            trade_confirmation,
+            df,
+        )
+
+        return {
+            "Stock": symbol,
+            "Current Price": round(current_price, 2),
+
+            "Nearest Support":
+                round(nearest_support.center, 2)
+                if nearest_support else None,
+
+            "Nearest Resistance":
+                round(nearest_resistance.center, 2)
+                if nearest_resistance else None,
+
+            "Volume vs MA":
+                round(vol_summary["latest_vol_ratio"], 2)
+                if pd.notna(vol_summary["latest_vol_ratio"])
+                else None,
+
+            "Structure": market_structure.trend_bias,
+
+            "Signal": trade_confirmation.signal,
+
+            "Confidence": trade_confirmation.confidence,
+
+            "Buy Score": trade_confirmation.buy_score,
+
+            "Sell Score": trade_confirmation.sell_score,
+
+            "Recommended Action":
+                trade_levels["side"]
+                if trade_levels
+                else "HOLD",
+
+            "Buy Price":
+                trade_levels["entry"]
+                if trade_levels and trade_levels["side"] == "BUY"
+                else None,
+
+            "Safe Buy Above":
+                trade_levels["safe_entry"]
+                if trade_levels and trade_levels["side"] == "BUY"
+                else None,
+
+            "Stop Loss":
+                trade_levels["stop_loss"]
+                if trade_levels
+                else None,
+
+            "Target 1":
+                trade_levels["target_1"]
+                if trade_levels
+                else None,
+        }
+
+    except Exception as e:
+        return {
+            "Stock": symbol,
+            "Recommended Action": "Error",
+            "Error": str(e),
+        }
+
 
 # ============================================================
 # CHART
@@ -1616,16 +1794,225 @@ show_option_chain = st.sidebar.checkbox(
 
 run_btn = st.sidebar.button("Run Analysis", type="primary")
 
+# ============================================================
+# WATCHLIST SCANNER
+# ============================================================
+st.sidebar.markdown("---")
+st.sidebar.subheader("Watchlist Scanner")
+
+watchlist_text = st.sidebar.text_area(
+    "Enter stock symbols (one per line)",
+    value="""ACC
+ADANIENT
+CANBK
+INFY
+OFSS
+EICHERMOT
+VEDL
+HINDALCO
+BPCL
+RELIANCE
+HDFCBANK
+BAJFINANCE
+HINDZINC
+HCLTECH
+NMDC
+COFORGE
+TCS
+COCHINSHIP
+MAZDOCK
+CDSL
+BSE
+MCX
+NH
+LICI""", height=200,
+)
+
+run_watchlist_btn = st.sidebar.button(
+    "Run Watchlist Scanner",
+    type="secondary",
+)
+
+
+# ============================================================
+        # WATCHLIST SCANNER RUN
+        # ============================================================
+if run_watchlist_btn:
+
+            # Safe token handling
+            access_token = access_token_sidebar
+
+            # Try Streamlit secrets only if sidebar token is empty
+            if not access_token:
+                try:
+                    access_token = st.secrets["UPSTOX_ACCESS_TOKEN"]
+                except Exception:
+                    access_token = ""
+
+            # Final validation
+            if not access_token:
+                st.error("Please provide Upstox access token.")
+                st.stop()
+
+            validation_error = validate_period_interval(
+                period,
+                interval,
+            )
+
+            if validation_error:
+                st.error(validation_error)
+                st.stop()
+
+            symbols = [
+                s.strip().upper()
+                for s in watchlist_text.splitlines()
+                if s.strip()
+            ]
+
+            if not symbols:
+                st.error("Please enter stock symbols.")
+                st.stop()
+
+            instruments_df = load_upstox_instruments(
+                lookup_exchange
+            )
+
+            results = []
+
+            progress_bar = st.progress(0)
+
+            for idx, symbol in enumerate(symbols):
+
+                result = analyze_single_symbol(
+                    access_token=access_token,
+                    symbol=symbol,
+                    instruments_df=instruments_df,
+                    period=period,
+                    interval=interval,
+                    lookup_exchange=lookup_exchange,
+                    volume_ma_window=volume_ma_window,
+                    left_bars=left_bars,
+                    right_bars=right_bars,
+                    zone_width_pct=zone_width_pct,
+                    min_touches=min_touches,
+                    trendline_tolerance_pct=trendline_tolerance_pct,
+                    include_live=include_live,
+                    require_trendline_confirmation=require_trendline_confirmation,
+                    use_retest_bonus=use_retest_bonus,
+                    breakout_buffer_pct=breakout_buffer_pct,
+                )
+
+                results.append(result)
+
+                progress_bar.progress(
+                    (idx + 1) / len(symbols)
+                )
+
+            scanner_df = pd.DataFrame(results)
+
+            st.markdown("## Watchlist Scanner")
+
+            def color_signal(val):
+
+                if val in ["Strong Buy", "BUY", "Buy"]:
+                    return "color: #00C853; font-weight: bold;"
+
+                elif val in ["Strong Sell", "SELL", "Sell"]:
+                    return "color: #FF1744; font-weight: bold;"
+
+                elif val == "HOLD":
+                    return "color: #FFD600; font-weight: bold;"
+
+                return ""
+            
+            # Remove decimals from numeric columns
+            # ============================================================
+            # SMART DISPLAY FORMATTING
+            # ============================================================
+            numeric_cols = [
+                "Current Price",
+                "Nearest Support",
+                "Nearest Resistance",
+                "Volume vs MA",
+                "Confidence",
+                "Buy Score",
+                "Sell Score",
+                "Buy Price",
+                "Safe Buy Above",
+                "Stop Loss",
+                "Target 1",
+            ]
+
+            def smart_format(x):
+
+                if pd.isna(x):
+                    return ""
+
+                x = float(x)
+
+                # Less than 1 → keep max 2 decimals
+                if abs(x) < 1:
+                    return f"{x:.2f}".rstrip("0").rstrip(".")
+
+                # Greater than or equal to 1 → no decimals
+                return int(round(x))
+
+
+            for col in numeric_cols:
+
+                if col in scanner_df.columns:
+
+                    scanner_df[col] = pd.to_numeric(
+                        scanner_df[col],
+                        errors="coerce"
+                    )
+
+                    scanner_df[col] = scanner_df[col].apply(
+                        smart_format
+                    )
+
+
+            styled_df = scanner_df.style.map(
+                color_signal,
+                subset=[
+                    "Signal",
+                    "Recommended Action",
+                ]
+            )
+
+            st.dataframe(
+                styled_df,
+                use_container_width=True,
+                hide_index=True,
+            )
+
+            csv = scanner_df.to_csv(index=False)
+
+            st.download_button(
+                "Download CSV",
+                csv,
+                file_name="watchlist_scanner.csv",
+                mime="text/csv",
+            )
+
+            st.stop()
+
 
 # ============================================================
 # MAIN APP
 # ============================================================
 if run_btn:
     try:
-        access_token = access_token_sidebar or st.secrets.get("UPSTOX_ACCESS_TOKEN", "")
+        access_token = access_token_sidebar
 
         if not access_token:
-            st.error("Please provide your Upstox access token in the sidebar or set UPSTOX_ACCESS_TOKEN in Streamlit secrets.")
+            try:
+                access_token = st.secrets["UPSTOX_ACCESS_TOKEN"]
+            except Exception:
+                access_token = ""
+
+        if not access_token:
+            st.error("""Please provide Upstox access token.""")
             st.stop()
 
         if not instrument_key:
@@ -1904,7 +2291,7 @@ if run_btn:
 
             for note in notes:
                 st.write(f"- {note}")
-
+        
         # ============================================================
         # OPTION CHAIN / OI / PCR
         # ============================================================
@@ -2034,6 +2421,9 @@ if run_btn:
 
 else:
     st.info("Set your Upstox token, search the instrument, select it, and click **Run Analysis**.")
+    st.info(
+    "If you want accuracy → use: **3mo + 1d**\n\n"
+    "If you want timing + entries → use: **1mo + 1h**.")
     st.markdown(
         """
 ### What this version includes
